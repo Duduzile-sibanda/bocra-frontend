@@ -1,0 +1,15 @@
+.section {
+  margin-top: 2rem;
+}
+
+.header h2 {
+  margin: 0;
+  color: #10243e;
+  font-size: 1.45rem;
+}
+
+.header p {
+  margin: 0.5rem 0 0;
+  color: #425f81;
+  max-width: 70ch;
+}

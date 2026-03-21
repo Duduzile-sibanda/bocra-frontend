@@ -1,0 +1,14 @@
+.card {
+  background: #ffffff;
+  border: 1px solid #d9e3ee;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(16, 36, 62, 0.06);
+  height: 100%;
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: #10243e;
+}
