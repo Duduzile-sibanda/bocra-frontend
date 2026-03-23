@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styles from './AdminHomePage.module.css'
+import bocraLogo from '../../assets/logo1.svg'
 
 type AdminStats = {
   pendingComplaints: number
@@ -16,6 +17,9 @@ const initialStats: AdminStats = {
 
 function AdminHomePage() {
   const [stats, setStats] = useState<AdminStats>(initialStats)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -33,155 +37,118 @@ function AdminHomePage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.headerGrain} />
-        <h1>BOCRA Digital Service Platform - Admin Dashboard</h1>
-        <p>Welcome, Admin. Manage the platform efficiently.</p>
-      </header>
-
-      <nav className={styles.nav}>
-        <a href="#complaints">Complaint Management</a>
-        <a href="#licensing">Licensing Management</a>
-        <a href="#content">Content Management</a>
-        <a href="#users">User Management</a>
-        <a href="#notifications">Notifications</a>
-        <a href="#analytics">Analytics</a>
-      </nav>
-
-      <div className={styles.container}>
-        <div className={styles.stats}>
-          <article className={styles.stat}>
-            <h3>Pending Complaints</h3>
-            <p>{stats.pendingComplaints}</p>
-          </article>
-          <article className={styles.stat}>
-            <h3>Active Licenses</h3>
-            <p>{stats.activeLicenses}</p>
-          </article>
-          <article className={styles.stat}>
-            <h3>Published Content</h3>
-            <p>{stats.publishedContent}</p>
-          </article>
+      <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
+        <div className={styles.logoContainer}>
+          <img src={bocraLogo} alt="BOCRA Logo" className={styles.logo} />
         </div>
 
-        <div className={styles.dashboardGrid}>
-          <section id="complaints" className={styles.dashboardSection}>
-            <h2>Complaint Management</h2>
-            <p>
-              As an admin, you can review and update the status of complaints submitted by
-              citizens and licensees. This includes:
-            </p>
-            <ul>
-              <li>Viewing all submitted complaints with details and evidence.</li>
-              <li>
-                Updating complaint status (e.g., from &apos;Submitted&apos; to &apos;Under
-                Review&apos;, &apos;Resolved&apos;, or &apos;Rejected&apos;).
-              </li>
-              <li>Assigning complaints to specific staff members for handling.</li>
-              <li>Communicating updates to users via the notifications system.</li>
-            </ul>
-            <p>
-              This module ensures timely resolution of public concerns and maintains
-              transparency in the complaint process.
-            </p>
-            <Link className={styles.button} to="/admin/complaints">
-              Manage Complaints
-            </Link>
-          </section>
+        <nav className={styles.sidebarNav}>
+          <Link to="/admin" className={styles.navItem} title="Dashboard">
+            <span className={styles.icon}>📊</span>
+            <span className={styles.label}>Dashboard</span>
+          </Link>
+          <Link to="/admin/analytics" className={styles.navItem} title="Analytics">
+            <span className={styles.icon}>📈</span>
+            <span className={styles.label}>Analytics</span>
+          </Link>
+          <Link to="/admin/complaints" className={styles.navItem} title="Complaints">
+            <span className={styles.icon}>⚠️</span>
+            <span className={styles.label}>Complaints</span>
+          </Link>
+          <Link to="/admin/licensing" className={styles.navItem} title="Licensing">
+            <span className={styles.icon}>📜</span>
+            <span className={styles.label}>Licensing</span>
+          </Link>
+          <Link to="/admin/content" className={styles.navItem} title="Content">
+            <span className={styles.icon}>📝</span>
+            <span className={styles.label}>Content</span>
+          </Link>
+          <Link to="/admin/notifications" className={styles.navItem} title="Notifications">
+            <span className={styles.icon}>🔔</span>
+            <span className={styles.label}>Notifications</span>
+          </Link>
+          <Link to="/admin/users" className={styles.navItem} title="Users">
+            <span className={styles.icon}>👥</span>
+            <span className={styles.label}>Users</span>
+          </Link>
+        </nav>
 
-          <section id="licensing" className={styles.dashboardSection}>
-            <h2>Licensing Management</h2>
-            <p>Manage license applications submitted by users. Your responsibilities include:</p>
-            <ul>
-              <li>Reviewing application details and supporting documents.</li>
-              <li>Approving or rejecting applications based on compliance.</li>
-              <li>Tracking application status and updating users accordingly.</li>
-              <li>Generating and issuing licenses upon approval.</li>
-            </ul>
-            <p>
-              This ensures efficient processing of licensing requests and supports business
-              operations in the communications sector.
-            </p>
-            <Link className={styles.button} to="/admin/licensing">
-              Manage Licenses
-            </Link>
-          </section>
-
-          <section id="content" className={styles.dashboardSection}>
-            <h2>Content Management System (CMS)</h2>
-            <p>Create, edit, and delete content to keep the public informed. Key functions:</p>
-            <ul>
-              <li>Publishing regulations, advisories, and announcements.</li>
-              <li>Categorizing content for easy search and retrieval.</li>
-              <li>Updating existing content to reflect changes in policies.</li>
-              <li>Managing multimedia content like images and documents.</li>
-            </ul>
-            <p>
-              This module empowers admins to maintain an up-to-date knowledge portal for users.
-            </p>
-            <Link className={styles.button} to="/admin/content">
-              Manage Content
-            </Link>
-          </section>
-
-          <section id="users" className={styles.dashboardSection}>
-            <h2>User Management</h2>
-            <p>Oversee user accounts and roles to ensure secure access. Tasks include:</p>
-            <ul>
-              <li>Registering new admin or staff accounts.</li>
-              <li>Assigning roles (Citizen, Licensee, Admin) with appropriate permissions.</li>
-              <li>Monitoring user activities and enforcing role-based access control.</li>
-              <li>Handling user support requests and account issues.</li>
-            </ul>
-            <p>This maintains system security and proper user segmentation.</p>
-            <Link className={styles.button} to="/admin/users">
-              Manage Users
-            </Link>
-          </section>
-
-          <section id="notifications" className={styles.dashboardSection}>
-            <h2>Notifications System</h2>
-            <p>Send updates and alerts to users. Capabilities:</p>
-            <ul>
-              <li>
-                Sending notifications for complaint status changes or application updates.
-              </li>
-              <li>Broadcasting system announcements and public advisories.</li>
-              <li>Allowing users to mark notifications as read.</li>
-              <li>Integrating with email or in-app notification channels.</li>
-            </ul>
-            <p>
-              This keeps users engaged and informed about their interactions with the
-              platform.
-            </p>
-            <Link className={styles.button} to="/admin/notifications">
-              Manage Notifications
-            </Link>
-          </section>
-
-          <section id="analytics" className={styles.dashboardSection}>
-            <h2>Analytics and Dashboard</h2>
-            <p>View system performance and usage statistics. Features:</p>
-            <ul>
-              <li>
-                Monitoring key metrics like complaint resolution times and application
-                volumes.
-              </li>
-              <li>Generating reports on user engagement and service usage.</li>
-              <li>Identifying trends to improve platform efficiency.</li>
-              <li>Accessing data analytics for decision-making.</li>
-            </ul>
-            <p>This provides insights to optimize the digital transformation efforts.</p>
-            <Link className={styles.button} to="/admin/analytics">
-              View Analytics
-            </Link>
-          </section>
+        <div className={styles.sidebarFooter}>
+          <div className={styles.settingsContainer}>
+            <button 
+              className={styles.settingsBtn} 
+              title="Settings"
+              onClick={() => setSettingsOpen(!settingsOpen)}
+            >
+              ⚙️
+            </button>
+            {settingsOpen && (
+              <div className={styles.settingsMenu}>
+                <Link to="/admin" className={styles.menuItem}>
+                  👤 Profile
+                </Link>
+                <Link to="/admin" className={styles.menuItem}>
+                  🔧 Preferences
+                </Link>
+                <button 
+                  className={styles.menuItem}
+                  onClick={() => {
+                    alert('Logging out...')
+                    // Add actual logout logic here
+                  }}
+                >
+                  🚪 Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </aside>
 
-      <footer className={styles.footer}>
-        <p>&copy; 2026 BOCRA Digital Service Platform. All rights reserved.</p>
-      </footer>
+      <main className={styles.mainContent}>
+        <header className={styles.topBar}>
+          <button
+            className={styles.menuToggle}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            title="Toggle Sidebar"
+          >
+            ☰
+          </button>
+          <h1 className={styles.pageTitle}>Dashboard</h1>
+          <div className={styles.headerFiller} />
+        </header>
+
+        <div className={styles.contentContainer}>
+          <section className={styles.welcomeSection}>
+            <h2>Welcome to the Admin Dashboard</h2>
+            <p>Manage all aspects of the BOCRA Digital Service Platform efficiently and effectively.</p>
+          </section>
+
+          <div className={styles.statsContainer}>
+            <article className={styles.statCard}>
+              <div className={styles.statIcon}>⚠️</div>
+              <div className={styles.statContent}>
+                <h3>Pending Complaints</h3>
+                <p className={styles.statValue}>{stats.pendingComplaints}</p>
+              </div>
+            </article>
+            <article className={styles.statCard}>
+              <div className={styles.statIcon}>📜</div>
+              <div className={styles.statContent}>
+                <h3>Active Licenses</h3>
+                <p className={styles.statValue}>{stats.activeLicenses}</p>
+              </div>
+            </article>
+            <article className={styles.statCard}>
+              <div className={styles.statIcon}>📝</div>
+              <div className={styles.statContent}>
+                <h3>Published Content</h3>
+                <p className={styles.statValue}>{stats.publishedContent}</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
