@@ -69,9 +69,8 @@ export const aboutSections: AboutSection[] = [
     id: 'board-of-directors',
     heading: 'Board of Directors',
     summary:
-      'BOCRA is led by seven non-executive board members and one ex-officio member (the Chief Executive), appointed by the Minister responsible for Communications under Section 4 of the Communications Regulatory Authority Act, 2012. The current Board took effect on August 1, 2025.',
+      'BOCRA is led by seven non-executive board members and one ex-officio member (the Chief Executive), appointed by the Minister responsible for Communications under Section 4 of the Communications Regulatory Authority Act, 2012. The current Board took effect on August 1, 2025.Strategic direction is aligned to the Botswana National Digital Economy Roadmap 2025-2030 and the Botswana Economic Transformation Programme.',
     bullets: [
-      'Strategic direction is aligned to the Botswana National Digital Economy Roadmap 2025-2030 and the Botswana Economic Transformation Programme.',
       'Dr. Bokamoso Basutli, PhD - Chairperson; Professional Engineer and academic leader in communications systems, signal processing, and AI.',
       'Mr. Moabi Pusumane - Vice Chairperson; commercial executive with broad leadership across telecom and market strategy.',
       'Board Members: Ms. Montle Phuthego; Ms. Alta Dimpho Seleka; Ms. Lebogang George; Mr. Ronald Kgafela, CODP; Dr. Kennedy Ramojela.',

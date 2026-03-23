@@ -13,6 +13,7 @@ const navItems = [
   { label: 'Licensing', to: '/licensing' },
   { label: 'Legislation', to: '/legislation' },
   { label: 'Complaints', to: '/complaints' },
+  { label: 'Admin', to: '/admin' },
 ]
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>

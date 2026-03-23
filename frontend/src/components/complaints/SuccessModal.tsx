@@ -8,6 +8,10 @@ type SuccessModalProps = {
   trackingId: string
   onTrackComplaint?: () => void
   onSubmitAnother?: () => void
+  title?: string
+  message?: string
+  trackActionLabel?: string
+  submitAnotherLabel?: string
 }
 
 const ANIMATION_MS = 180
@@ -18,6 +22,10 @@ function SuccessModal({
   trackingId,
   onTrackComplaint,
   onSubmitAnother,
+  title = 'Complaint Submitted Successfully',
+  message = 'Please save this ID to track your complaint',
+  trackActionLabel = 'Track Complaint',
+  submitAnotherLabel = 'Submit Another',
 }: SuccessModalProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const [isMounted, setIsMounted] = useState<boolean>(isOpen)
@@ -106,9 +114,9 @@ function SuccessModal({
           <FiCheckCircle aria-hidden="true" className="mt-0.5 h-7 w-7 text-green-600" />
           <div className="w-full">
             <h2 id="success-modal-title" className="text-xl font-bold text-slate-900">
-              Complaint Submitted Successfully
+              {title}
             </h2>
-            <p className="mt-2 text-sm text-slate-600">Please save this ID to track your complaint</p>
+            <p className="mt-2 text-sm text-slate-600">{message}</p>
             <p className="mt-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 font-mono text-sm font-semibold text-green-800">
               {trackingId}
             </p>
@@ -118,12 +126,12 @@ function SuccessModal({
         <div className="mt-6 flex flex-wrap gap-2">
           {onTrackComplaint ? (
             <ActionButton onClick={onTrackComplaint} variant="primary">
-              Track Complaint
+              {trackActionLabel}
             </ActionButton>
           ) : null}
           {onSubmitAnother ? (
             <ActionButton onClick={onSubmitAnother} variant="secondary">
-              Submit Another
+              {submitAnotherLabel}
             </ActionButton>
           ) : null}
           <ActionButton onClick={onClose} variant="secondary">

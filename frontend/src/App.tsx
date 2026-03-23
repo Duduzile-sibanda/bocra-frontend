@@ -12,6 +12,13 @@ import LicensingPage from './pages/LicensingPage'
 import ProjectsPage from './pages/ProjectsPage'
 import TendersPage from './pages/TendersPage'
 import TrackComplaintPage from './pages/TrackComplaintPage'
+import AdminHomePage from './pages/admin/AdminHomePage'
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
+import AdminComplaintsPage from './pages/admin/AdminComplaintsPage'
+import AdminContentPage from './pages/admin/AdminContentPage'
+import AdminLicensingPage from './pages/admin/AdminLicensingPage'
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
   return (
@@ -29,6 +36,14 @@ function App() {
           <Route path="/complaints" element={<ComplaintsPage />} />
           <Route path="/complaints/track" element={<TrackComplaintPage />} />
           <Route path="/complaints/status/:trackingId" element={<ComplaintStatusPage />} />
+          <Route path="/admin" element={<AdminHomePage />} />
+          <Route path="/admin/dashboard" element={<AdminHomePage />} />
+          <Route path="/admin/complaints" element={<AdminComplaintsPage />} />
+          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+          <Route path="/admin/content" element={<AdminContentPage />} />
+          <Route path="/admin/licensing" element={<AdminLicensingPage />} />
+          <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
