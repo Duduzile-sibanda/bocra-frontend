@@ -264,7 +264,7 @@ function ComplaintsPage() {
                       setFeedbackModal({
                         isOpen: true,
                         title: 'Complaint Found!',
-                        message: `Tracking ID ${record.trackingId} was found. Opening status details now.`,
+                        message: `Reference ID ${record.trackingId} was found. Opening status details now.`,
                         tone: 'success',
                       })
                       window.setTimeout(() => {
@@ -274,8 +274,8 @@ function ComplaintsPage() {
                     onInvalidId={() =>
                       setFeedbackModal({
                         isOpen: true,
-                        title: 'Invalid Tracking ID',
-                        message: 'Please enter a valid tracking ID before checking status.',
+                        title: 'Invalid Reference ID',
+                        message: 'Please enter a valid complaint reference ID before checking status.',
                         tone: 'error',
                       })
                     }
@@ -283,7 +283,15 @@ function ComplaintsPage() {
                       setFeedbackModal({
                         isOpen: true,
                         title: 'Complaint Not Found',
-                        message: `No complaint was found for tracking ID ${trackingId}. Please verify and try again.`,
+                        message: `No complaint was found for reference ID ${trackingId}. Please verify and try again.`,
+                        tone: 'error',
+                      })
+                    }
+                    onLookupError={(message) =>
+                      setFeedbackModal({
+                        isOpen: true,
+                        title: 'Lookup Failed',
+                        message,
                         tone: 'error',
                       })
                     }

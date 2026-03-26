@@ -5,8 +5,8 @@ import {
   FaXTwitter,
   FaYoutube,
 } from 'react-icons/fa6'
-import { HiOutlineMapPin } from 'react-icons/hi2'
-import logo from '../assets/logo.svg'
+import { HiOutlineEnvelope, HiOutlineMapPin, HiOutlinePhone } from 'react-icons/hi2'
+import logo from '../assets/bocra.png'
 
 const socialLinks = [
   {
@@ -36,9 +36,7 @@ const socialLinks = [
 ]
 
 const footerNavLinkClass = ({ isActive }) =>
-  `block px-2 py-2 transition-colors duration-200 ${
-    isActive ? 'text-[#BF1F5A]' : 'text-white hover:text-[#038C65]'
-  }`
+  `block px-2 py-2 !text-white transition-colors duration-200 hover:!text-white visited:!text-white`
 
 function Footer() {
   return (
@@ -54,13 +52,13 @@ function Footer() {
 
               <address
                 aria-label="BOCRA contact details"
-                className="not-italic text-base leading-7 text-white"
+                className="not-italic text-base leading-7 !text-white"
               >
                 <div className="space-y-2">
                   <p>Botswana Communications Regulatory Authority</p>
 
                   <a
-                    className="inline-flex items-start gap-2 text-white transition-colors visited:text-[#BF1F5A] hover:text-[#038C65]"
+                    className="inline-flex items-start gap-2 !text-white transition-colors visited:!text-white hover:!text-white"
                     href="https://www.google.com/maps/search/?api=1&query=Plot+50671+Independence+Avenue+Gaborone+Botswana"
                     rel="noopener noreferrer"
                     target="_blank"
@@ -73,13 +71,14 @@ function Footer() {
                     </span>
                   </a>
 
-                  <p>Phone: +267 395 7755</p>
+                  <p className="inline-flex items-center gap-2">
+                    <HiOutlinePhone aria-hidden="true" className="h-5 w-5 shrink-0" />
+                    <span>Phone: +267 395 7755</span>
+                  </p>
 
-                  <a
-                    className="text-white transition-colors visited:text-[#BF1F5A] hover:text-[#038C65]"
-                    href="mailto:info@bocra.org.bw"
-                  >
-                    info@bocra.org.bw
+                  <a className="inline-flex items-center gap-2 !text-white transition-colors visited:!text-white hover:!text-white" href="mailto:info@bocra.org.bw">
+                    <HiOutlineEnvelope aria-hidden="true" className="h-5 w-5 shrink-0" />
+                    <span>info@bocra.org.bw</span>
                   </a>
                 </div>
               </address>
@@ -91,7 +90,7 @@ function Footer() {
               Quick Links
             </h2>
             <nav aria-label="Footer navigation">
-              <ul className="space-y-2 text-base leading-7 text-white">
+              <ul className="space-y-2 text-base leading-7 !text-white">
                 <li>
                   <NavLink className={footerNavLinkClass} end to="/about">
                     About

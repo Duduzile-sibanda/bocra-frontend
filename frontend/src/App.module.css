@@ -1,11 +1,17 @@
 .app {
   min-height: 100vh;
-  background: #f6f8fb;
+  background: var(--page-background);
   color: #10243e;
 }
 
 .content {
   width: min(1120px, 92%);
   margin: 0 auto;
-  padding: 0;
+  padding: 0 0 2rem;
+}
+
+.content p,
+.content li {
+  font-size: 1.125rem;
+  line-height: 1.7;
 }

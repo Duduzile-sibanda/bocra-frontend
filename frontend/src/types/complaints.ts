@@ -14,7 +14,7 @@ export const complaintCategories = [
 
 export type ComplaintCategory = (typeof complaintCategories)[number]
 
-export type ComplaintStatus = 'Submitted' | 'In Review' | 'Resolved'
+export type ComplaintStatus = 'Submitted' | 'In Review' | 'Resolved' | 'Rejected'
 
 export type ComplaintRecord = {
   trackingId: string
@@ -22,14 +22,18 @@ export type ComplaintRecord = {
   email: string
   company: string
   phone: string
-  category: ComplaintCategory
+  category: string
   complaint: string
   submittedAt: string
   status: ComplaintStatus
   statusMessage: string
 }
 
-export type ComplaintFormValues = Omit<
-  ComplaintRecord,
-  'trackingId' | 'submittedAt' | 'status' | 'statusMessage'
->
+export type ComplaintFormValues = {
+  name: string
+  email: string
+  company: string
+  phone: string
+  category: ComplaintCategory
+  complaint: string
+}

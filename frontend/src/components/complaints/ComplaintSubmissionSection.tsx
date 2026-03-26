@@ -26,10 +26,12 @@ function ComplaintSubmissionSection({ onSuccess, resetToken = 0 }: ComplaintSubm
   const [values, setValues] = useState<ComplaintFormValues>(initialValues)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [submitError, setSubmitError] = useState<string>('')
 
   useEffect(() => {
     setValues(initialValues)
     setErrors({})
+    setSubmitError('')
   }, [resetToken])
 
   const categoryOptions = useMemo(
@@ -51,15 +53,16 @@ function ComplaintSubmissionSection({ onSuccess, resetToken = 0 }: ComplaintSubm
     return nextErrors
   }
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const nextErrors = validate(values)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    setSubmitError('')
     setIsSubmitting(true)
-    window.setTimeout(() => {
-      const record = submitComplaint({
+    try {
+      const savedRecord = await submitComplaint({
         ...values,
         name: values.name.trim(),
         email: values.email.trim(),
@@ -67,9 +70,13 @@ function ComplaintSubmissionSection({ onSuccess, resetToken = 0 }: ComplaintSubm
         phone: values.phone.trim(),
         complaint: values.complaint.trim(),
       })
+      onSuccess(savedRecord)
+    } catch (error) {
+      const fallback = 'We could not submit your complaint right now. Please try again.'
+      setSubmitError(error instanceof Error && error.message ? error.message : fallback)
+    } finally {
       setIsSubmitting(false)
-      onSuccess(record)
-    }, 700)
+    }
   }
 
   return (
@@ -146,6 +153,11 @@ function ComplaintSubmissionSection({ onSuccess, resetToken = 0 }: ComplaintSubm
             Submit Complaint
           </ActionButton>
         </div>
+        {submitError ? (
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            {submitError}
+          </p>
+        ) : null}
       </form>
     </section>
   )

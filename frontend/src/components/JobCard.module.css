@@ -2,7 +2,7 @@
   padding: 1.15rem 0.25rem 1.15rem 0;
   border-bottom: 1px solid #e6e8eb;
   transition: background-color 180ms ease;
-  font-family: Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-body);
 }
 
 .card:hover {

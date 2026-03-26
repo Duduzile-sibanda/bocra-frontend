@@ -5,7 +5,10 @@
 .header h2 {
   margin: 0;
   color: #10243e;
-  font-size: 1.45rem;
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
 }
 
 .header p {
