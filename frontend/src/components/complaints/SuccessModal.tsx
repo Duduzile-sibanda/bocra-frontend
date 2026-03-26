@@ -23,7 +23,7 @@ function SuccessModal({
   onTrackComplaint,
   onSubmitAnother,
   title = 'Complaint Submitted Successfully',
-  message = 'Please save this ID to track your complaint',
+  message = 'Please save this reference ID to track your complaint',
   trackActionLabel = 'Track Complaint',
   submitAnotherLabel = 'Submit Another',
 }: SuccessModalProps) {

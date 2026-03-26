@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import ActionButton from '../ui/ActionButton'
 import LicenseVerificationSearch, { type LicenseTypeFilter } from './LicenseVerificationSearch'
 
@@ -17,6 +17,7 @@ type LicenseVerificationModalProps = {
 
 const PAGE_SIZE = 10
 const ANIMATION_MS = 180
+const LAST_QUERY_KEY = 'bocra_license_verification_last_query'
 
 const MOCK_LICENSES: LicenseRecord[] = [
   { licenseNo: 'LIC-2026-000101', type: 'Spectrum Licence', clientName: 'Kalahari Networks', expiryDate: '2028-01-31', status: 'Active' },
@@ -65,10 +66,21 @@ function LicenseVerificationModal({ isOpen, onClose }: LicenseVerificationModalP
       const raf = requestAnimationFrame(() => setIsVisible(true))
       return () => cancelAnimationFrame(raf)
     }
+
     setIsVisible(false)
     const timeout = window.setTimeout(() => setIsMounted(false), ANIMATION_MS)
     return () => window.clearTimeout(timeout)
   }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const savedQuery = window.localStorage.getItem(LAST_QUERY_KEY)
+    if (savedQuery) setQuery(savedQuery)
+  }, [isOpen])
+
+  useEffect(() => {
+    window.localStorage.setItem(LAST_QUERY_KEY, query)
+  }, [query])
 
   useEffect(() => {
     if (!isOpen) return
@@ -207,13 +219,9 @@ function LicenseVerificationModal({ isOpen, onClose }: LicenseVerificationModalP
         </div>
 
         <div className="mt-4 flex-1 overflow-hidden rounded-xl border border-slate-200 bg-white">
-          {isLoading ? (
-            <div className="p-6 text-sm text-slate-700">Searching...</div>
-          ) : null}
+          {isLoading ? <div className="p-6 text-sm text-slate-700">Searching...</div> : null}
 
-          {!isLoading && error ? (
-            <div className="p-6 text-sm text-red-700">{error}</div>
-          ) : null}
+          {!isLoading && error ? <div className="p-6 text-sm text-red-700">{error}</div> : null}
 
           {!isLoading && !error && hasSearched && totalResults === 0 ? (
             <div className="p-6 text-sm text-slate-700">No results found. Try a different search.</div>
@@ -302,4 +310,3 @@ function LicenseVerificationModal({ isOpen, onClose }: LicenseVerificationModalP
 }
 
 export default LicenseVerificationModal
-

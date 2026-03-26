@@ -32,18 +32,35 @@
   justify-content: flex-end;
 }
 
+.homeHeroBrand {
+  display: grid;
+  justify-items: end;
+  gap: 0.9rem;
+  max-width: min(940px, 95%);
+}
+
+.homeHeroLogo {
+  width: clamp(180px, 28vw, 340px);
+  height: auto;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+  transform: translateX(-26px);
+  opacity: 0;
+  animation: heroSlideIn 2200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .homeHeroTitle {
   margin: 0;
-  max-width: min(900px, 92%);
+  max-width: min(900px, 100%);
   text-align: right;
   color: #ffffff;
-  font-size: clamp(1.8rem, 4.1vw, 4rem);
+  font-size: clamp(2.4rem, 5.4vw, 5.4rem);
+  font-weight: 800;
   line-height: 1.06;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   text-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
   transform: translateX(-44px);
   opacity: 0;
-  animation: heroSlideIn 1400ms cubic-bezier(0.22, 1, 0.36, 1) 150ms forwards;
+  animation: heroSlideIn 2400ms cubic-bezier(0.16, 1, 0.3, 1) 220ms forwards;
 }
 
 @keyframes heroSlideIn {
@@ -57,6 +74,88 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
+}
+
+.quickLinksCarousel {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.quickLinksShell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.carouselTrack {
+  display: grid;
+  grid-template-columns: 1.08fr 1.28fr 1.08fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.carouselSlide {
+  transform: scale(0.9);
+  opacity: 0.78;
+  transition: transform 420ms ease, opacity 420ms ease;
+}
+
+.carouselSlideCenter {
+  transform: scale(1.03);
+  opacity: 1;
+}
+
+.homeCarouselCard {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.homeCarouselCard > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.carouselControl {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 1px solid #c8d7e7;
+  background: #ffffff;
+  color: #1d4d79;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 14px rgba(16, 36, 62, 0.08);
+}
+
+.carouselControl:hover {
+  background: #f5f9ff;
+}
+
+.carouselDots {
+  margin-top: 0.95rem;
+  display: flex;
+  gap: 0.55rem;
+  justify-content: center;
+}
+
+.carouselDot {
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 999px;
+  border: 0;
+  background: #c5d5e6;
+  cursor: pointer;
+}
+
+.carouselDotActive {
+  width: 1.4rem;
+  background: #1a568a;
 }
 
 .gridTwo {
@@ -74,6 +173,22 @@
 .muted {
   color: #436182;
   margin: 0.25rem 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardActionWrap {
+  margin: 0.95rem 0 0;
+}
+
+.cardActionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .careersIntro {
@@ -83,7 +198,10 @@
 .careersIntroTitle {
   margin: 0;
   color: #10243e;
-  font-size: clamp(1.7rem, 2.4vw, 2.5rem);
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
 }
 
 .careersIntroText {
@@ -217,9 +335,39 @@
     padding: 1.5rem 1rem;
   }
 
+  .homeHeroBrand {
+    justify-items: start;
+  }
+
+  .homeHeroLogo {
+    transform: translateX(-20px);
+  }
+
   .homeHeroTitle {
     text-align: left;
     max-width: 100%;
+  }
+
+  .quickLinksCarousel {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.45rem;
+  }
+
+  .quickLinksShell {
+    width: min(100%, 1100px);
+  }
+
+  .carouselTrack {
+    gap: 0.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .carouselSlide {
+    transform: scale(0.84);
+  }
+
+  .carouselSlideCenter {
+    transform: scale(1);
   }
 
   .gridThree,

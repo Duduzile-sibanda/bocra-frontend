@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 import SuccessModal from '../components/complaints/SuccessModal'
+import LicenseTrackingModal from '../components/licensing/LicenseTrackingModal'
 import LicenseVerificationModal from '../components/licensing/LicenseVerificationModal'
 import UploadModal, { type UploadPayload } from '../components/licensing/UploadModal'
 import ActionButton from '../components/ui/ActionButton'
@@ -306,18 +307,22 @@ const LICENSE_OPTIONS: LicenseOption[] = [
 ]
 
 function generateTrackingId(): string {
-  const year = new Date().getFullYear()
-  const randomValue = Math.floor(Math.random() * 100000)
-  const padded = String(randomValue).padStart(5, '0')
-  return `LIC-${year}-${padded}`
+  return `LIC-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`
+}
+
+async function sendEmail(email: string, trackingId: string): Promise<void> {
+  // Mock email dispatch to simulate confirmation delivery.
+  await new Promise((resolve) => window.setTimeout(resolve, 500))
+  console.info(`Mock email sent to ${email} for tracking ID ${trackingId}`)
 }
 
 type IntroSectionProps = {
   onGetStarted: () => void
   onOpenVerification: () => void
+  onOpenTracking: () => void
 }
 
-function IntroSection({ onGetStarted, onOpenVerification }: IntroSectionProps) {
+function IntroSection({ onGetStarted, onOpenVerification, onOpenTracking }: IntroSectionProps) {
   return (
     <div className="w-full max-w-5xl rounded-2xl border border-slate-200 bg-white p-7 shadow-sm md:max-h-[78svh] md:overflow-y-auto md:p-10">
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-5xl">Licensing</h1>
@@ -329,7 +334,7 @@ function IntroSection({ onGetStarted, onOpenVerification }: IntroSectionProps) {
           permissions, concessions and authorities for regulated sectors being telecommunications, Internet, radio
           communications, broadcasting and postal.
         </p>
-        <h3 className="pt-2 text-base font-semibold text-slate-900 md:text-lg">
+        <h3 className="pt-2 text-base font-semibold text-slate-900 [font-family:var(--font-body)] md:text-lg">
           Licensing Framework (Telecommunications And Broadcasting)
         </h3>
         <p>
@@ -361,20 +366,26 @@ function IntroSection({ onGetStarted, onOpenVerification }: IntroSectionProps) {
           other licensed operators on commercial basis. Private Telecommunications Networks fall in this category and
           are further specified in the appropriate license type to distinguish them from major networks.
         </p>
-        <h3 className="pt-2 text-base font-semibold text-slate-900 md:text-lg">Services And Applications Provider (SAP)</h3>
+        <h3 className="pt-2 text-base font-semibold text-slate-900 [font-family:var(--font-body)] md:text-lg">
+          Services And Applications Provider (SAP)
+        </h3>
         <p>
           SAPs are non-infrastructure based service providers that provide all forms of services and applications to
           end users using infrastructure of the Network Facilities Provider. The services and applications may be based
           on speech, sound, data, text and images and they deliver a specific function to the end user. The services
           and applications shall not be for broadcasting purposes.
         </p>
-        <h3 className="pt-2 text-base font-semibold text-slate-900 md:text-lg">Content Services Provider (CSP)</h3>
+        <h3 className="pt-2 text-base font-semibold text-slate-900 [font-family:var(--font-body)] md:text-lg">
+          Content Services Provider (CSP)
+        </h3>
         <p>
           CSP licensee provides content material in the form of speech or other sounds, text, data, images, whether
           still or moving solely for broadcasting (TV and radio) and other information services including Subscription
           TV. NB, State broadcasters do not require license to operate.
         </p>
-        <h3 className="pt-2 text-base font-semibold text-slate-900 md:text-lg">Licensing Framework (Postal Services)</h3>
+        <h3 className="pt-2 text-base font-semibold text-slate-900 [font-family:var(--font-body)] md:text-lg">
+          Licensing Framework (Postal Services)
+        </h3>
         <p>
           In August 2015 BOCRA conducted a study to assess the postal market and develop appropriate licensing
           framework. Following conclusion of the study, BOCRA introduced a licensing framework that provides for two
@@ -396,6 +407,9 @@ function IntroSection({ onGetStarted, onOpenVerification }: IntroSectionProps) {
           <ActionButton onClick={onGetStarted}>Get Started</ActionButton>
           <ActionButton onClick={onOpenVerification} variant="secondary">
             License Verification
+          </ActionButton>
+          <ActionButton onClick={onOpenTracking} variant="secondary">
+            Track Application
           </ActionButton>
         </div>
       </div>
@@ -576,9 +590,10 @@ type UploadSectionProps = {
   selectedLicense: LicenseOption | undefined
   onOpenUpload: () => void
   onOpenSelection: () => void
+  onOpenTracking: () => void
 }
 
-function UploadSection({ selectedLicense, onOpenUpload, onOpenSelection }: UploadSectionProps) {
+function UploadSection({ selectedLicense, onOpenUpload, onOpenSelection, onOpenTracking }: UploadSectionProps) {
   return (
     <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white p-7 shadow-sm md:p-10">
       <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">Upload Completed Application</h2>
@@ -597,6 +612,9 @@ function UploadSection({ selectedLicense, onOpenUpload, onOpenSelection }: Uploa
         <ActionButton onClick={onOpenUpload} disabled={!selectedLicense}>
           Open Upload Form
         </ActionButton>
+        <ActionButton onClick={onOpenTracking} variant="secondary">
+          Track Application
+        </ActionButton>
         {!selectedLicense ? (
           <ActionButton onClick={onOpenSelection} variant="secondary">
             Choose License First
@@ -611,6 +629,7 @@ function LicensingPage() {
   const [selectedLicenseId, setSelectedLicenseId] = useState<string>('')
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false)
   const [isVerificationOpen, setIsVerificationOpen] = useState<boolean>(false)
+  const [isTrackingOpen, setIsTrackingOpen] = useState<boolean>(false)
   const [isSubmittingUpload, setIsSubmittingUpload] = useState<boolean>(false)
   const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false)
   const [trackingId, setTrackingId] = useState<string>('')
@@ -622,19 +641,30 @@ function LicensingPage() {
     [selectedLicenseId],
   )
 
+  const showDetailSection = Boolean(selectedLicense?.infoOnly)
+
   const sections = useMemo(
-    () => [
-      { id: 'intro', label: 'Intro' },
-      { id: 'selection', label: 'Select' },
-      { id: 'detail', label: 'Details' },
-      { id: 'upload', label: 'Upload' },
-    ],
-    [],
+    () =>
+      showDetailSection
+        ? [
+            { id: 'intro', label: 'Intro' },
+            { id: 'selection', label: 'Select' },
+            { id: 'detail', label: 'Details' },
+            { id: 'upload', label: 'Upload' },
+          ]
+        : [
+            { id: 'intro', label: 'Intro' },
+            { id: 'selection', label: 'Select' },
+            { id: 'upload', label: 'Upload' },
+          ],
+    [showDetailSection],
   )
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const totalSections = sections.length
+  const detailIndex = sections.findIndex((section) => section.id === 'detail')
+  const uploadIndex = sections.findIndex((section) => section.id === 'upload')
 
   useEffect(() => {
     const storedLicenseId = window.localStorage.getItem('bocra_selected_license_id')
@@ -728,6 +758,10 @@ function LicensingPage() {
     }
   }, [activeIndex, isMobile, totalSections])
 
+  useEffect(() => {
+    setActiveIndex((current) => Math.min(current, totalSections - 1))
+  }, [totalSections])
+
   const handleSelectLicense = (license: LicenseOption) => {
     setSelectedLicenseId(license.id)
 
@@ -739,20 +773,34 @@ function LicensingPage() {
       document.body.appendChild(link)
       link.click()
       link.remove()
-      scrollToSection(3)
+      scrollToSection(uploadIndex)
       return
     }
 
-    scrollToSection(2)
+    if (license.infoOnly && detailIndex >= 0) {
+      scrollToSection(detailIndex)
+      return
+    }
+
+    scrollToSection(uploadIndex)
   }
 
-  const handleUploadSubmit = async (_payload: UploadPayload) => {
+  const handleUploadSubmit = async (payload: UploadPayload) => {
     setIsSubmittingUpload(true)
 
     // Simulate server processing before returning a tracking reference.
     await new Promise((resolve) => window.setTimeout(resolve, 1200))
 
     const nextTrackingId = generateTrackingId()
+    await sendEmail(payload.email, nextTrackingId)
+    window.localStorage.setItem(
+      'lastApplication',
+      JSON.stringify({
+        trackingId: nextTrackingId,
+        email: payload.email,
+        licenseType: selectedLicense?.name ?? 'Not provided',
+      }),
+    )
     setTrackingId(nextTrackingId)
     setIsUploadOpen(false)
     setIsSuccessOpen(true)
@@ -778,6 +826,7 @@ function LicensingPage() {
             <IntroSection
               onGetStarted={() => scrollToSection(1)}
               onOpenVerification={() => setIsVerificationOpen(true)}
+              onOpenTracking={() => setIsTrackingOpen(true)}
             />
           </div>
         </section>
@@ -798,19 +847,21 @@ function LicensingPage() {
           </div>
         </section>
 
-        <section
-          className={`snap-start min-w-[100vw] h-screen ${
-            isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
-          }`}
-        >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
-            <LicenseDetailSection
-              selectedLicense={selectedLicense?.infoOnly ? selectedLicense : undefined}
-              onProceedToUpload={() => scrollToSection(3)}
-              onOpenSelection={() => scrollToSection(1)}
-            />
-          </div>
-        </section>
+        {showDetailSection ? (
+          <section
+            className={`snap-start min-w-[100vw] h-screen ${
+              isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
+            }`}
+          >
+            <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+              <LicenseDetailSection
+                selectedLicense={selectedLicense?.infoOnly ? selectedLicense : undefined}
+                onProceedToUpload={() => scrollToSection(uploadIndex)}
+                onOpenSelection={() => scrollToSection(1)}
+              />
+            </div>
+          </section>
+        ) : null}
 
         <section
           id="apply"
@@ -823,6 +874,7 @@ function LicensingPage() {
               selectedLicense={selectedLicense}
               onOpenUpload={() => setIsUploadOpen(true)}
               onOpenSelection={() => scrollToSection(1)}
+              onOpenTracking={() => setIsTrackingOpen(true)}
             />
           </div>
         </section>
@@ -881,12 +933,13 @@ function LicensingPage() {
       />
 
       <LicenseVerificationModal isOpen={isVerificationOpen} onClose={() => setIsVerificationOpen(false)} />
+      <LicenseTrackingModal isOpen={isTrackingOpen} onClose={() => setIsTrackingOpen(false)} />
 
       <SuccessModal
         isOpen={isSuccessOpen}
         trackingId={trackingId}
         title="Application Submitted Successfully"
-        message="Please save this ID to track your licensing application."
+        message="Your application has been submitted. A confirmation has been sent to your email. Use your email and tracking ID to check status."
         onClose={() => setIsSuccessOpen(false)}
         onSubmitAnother={() => {
           setIsSuccessOpen(false)

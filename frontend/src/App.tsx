@@ -12,6 +12,10 @@ import LicensingPage from './pages/LicensingPage'
 import ProjectsPage from './pages/ProjectsPage'
 import TendersPage from './pages/TendersPage'
 import TrackComplaintPage from './pages/TrackComplaintPage'
+import PostalPage from './pages/PostalPage'
+import InternetPage from './pages/InternetPage'
+import BroadcastingPage from './pages/BroadcastingPage'
+import TelecommunicationsPage from './pages/TelecommunicationsPage'
 import AdminHomePage from './pages/admin/AdminHomePage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
 import AdminComplaintsPage from './pages/admin/AdminComplaintsPage'
@@ -31,6 +35,10 @@ function App() {
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/tenders" element={<TendersPage />} />
+          <Route path="/postal" element={<PostalPage />} />
+          <Route path="/internet" element={<InternetPage />} />
+          <Route path="/broadcasting" element={<BroadcastingPage />} />
+          <Route path="/telecommunications" element={<TelecommunicationsPage />} />
           <Route path="/licensing" element={<LicensingPage />} />
           <Route path="/legislation" element={<LegislationPage />} />
           <Route path="/complaints" element={<ComplaintsPage />} />

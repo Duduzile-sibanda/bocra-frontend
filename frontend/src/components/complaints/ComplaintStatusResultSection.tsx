@@ -1,7 +1,7 @@
 import type { ComplaintRecord, ComplaintStatus } from '../../types/complaints'
 import StepIndicator from './StepIndicator'
 
-const statusSteps: ComplaintStatus[] = ['Submitted', 'In Review', 'Resolved']
+const statusSteps: ComplaintStatus[] = ['Submitted', 'In Review', 'Resolved', 'Rejected']
 
 const formatSubmittedDate = (isoDate: string) =>
   new Intl.DateTimeFormat('en-BW', {
@@ -24,7 +24,7 @@ function ComplaintStatusResultSection({ record }: ComplaintStatusResultSectionPr
 
       <div className="mt-6 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
         <p className="text-sm text-slate-700">
-          <span className="font-semibold text-slate-900">Tracking ID:</span> {record.trackingId}
+          <span className="font-semibold text-slate-900">Reference ID:</span> {record.trackingId}
         </p>
         <p className="text-sm text-slate-700">
           <span className="font-semibold text-slate-900">Category:</span> {record.category}
@@ -41,7 +41,7 @@ function ComplaintStatusResultSection({ record }: ComplaintStatusResultSectionPr
       <div className="mt-8">
         <StepIndicator
           currentStep={currentStep}
-          steps={['Submitted', 'In Review', 'Resolved']}
+          steps={['Submitted', 'In Review', 'Resolved', 'Rejected']}
         />
       </div>
 

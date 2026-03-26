@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+:root {
+  --page-background: #f6f8fb;
+  --font-body: 'Raleway', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-heading: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 *,
 *::before,
 *::after {
@@ -14,10 +20,30 @@ body,
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #ffffff;
+  font-family: var(--font-body);
+  background: var(--page-background);
   color: #111827;
   line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  font-weight: 600;
 }
 
 a {
