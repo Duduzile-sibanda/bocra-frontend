@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ComplaintStatusResultSection from '../components/complaints/ComplaintStatusResultSection'
-import { getComplaintByTrackingId } from '../utils/complaintsStorage'
+import { useComplaintsStore } from '../stores/complaintsStore'
 
 function ComplaintStatusPage() {
   const { trackingId } = useParams()
+  const getComplaintByTrackingId = useComplaintsStore((state) => state.getComplaintByTrackingId)
   const decodedTrackingId = trackingId ? decodeURIComponent(trackingId) : ''
   const [record, setRecord] = useState<Awaited<ReturnType<typeof getComplaintByTrackingId>>>(null)
   const [isLoading, setIsLoading] = useState<boolean>(Boolean(decodedTrackingId))

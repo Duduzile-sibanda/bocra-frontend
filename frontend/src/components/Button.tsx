@@ -8,21 +8,22 @@ type Props = {
   to?: string
   type?: 'button' | 'submit' | 'reset'
   variant?: ButtonVariant
+  className?: string
 }
 
-function Button({ label, to, type = 'button', variant = 'secondary' }: Props) {
-  const className = `${styles.button} ${styles[variant]}`
+function Button({ label, to, type = 'button', variant = 'secondary', className = '' }: Props) {
+  const buttonClassName = `${styles.button} ${styles[variant]} ${className}`.trim()
 
   if (to) {
     return (
-      <Link className={className} to={to}>
+      <Link className={buttonClassName} to={to}>
         {label}
       </Link>
     )
   }
 
   return (
-    <button className={className} type={type}>
+    <button className={buttonClassName} type={type}>
       {label}
     </button>
   )

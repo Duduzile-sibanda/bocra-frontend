@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { FiCheckCircle } from 'react-icons/fi'
+import { FiCheck, FiCheckCircle, FiCopy } from 'react-icons/fi'
 import ActionButton from '../ui/ActionButton'
 
 type SuccessModalProps = {
@@ -30,10 +30,12 @@ function SuccessModal({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const [isMounted, setIsMounted] = useState<boolean>(isOpen)
   const [isVisible, setIsVisible] = useState<boolean>(isOpen)
+  const [isCopied, setIsCopied] = useState<boolean>(false)
 
   useEffect(() => {
     if (isOpen) {
       setIsMounted(true)
+      setIsCopied(false)
       const raf = requestAnimationFrame(() => setIsVisible(true))
       return () => cancelAnimationFrame(raf)
     }
@@ -91,6 +93,34 @@ function SuccessModal({
 
   if (!isMounted) return null
 
+  const fallbackCopy = (value: string) => {
+    const textarea = document.createElement('textarea')
+    textarea.value = value
+    textarea.setAttribute('readonly', '')
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    const copied = document.execCommand('copy')
+    document.body.removeChild(textarea)
+    return copied
+  }
+
+  const handleCopyTrackingId = async () => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(trackingId)
+      } else {
+        const copied = fallbackCopy(trackingId)
+        if (!copied) throw new Error('Fallback copy failed')
+      }
+      setIsCopied(true)
+      window.setTimeout(() => setIsCopied(false), 1400)
+    } catch {
+      setIsCopied(false)
+    }
+  }
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center px-4 transition-opacity duration-200 ${
@@ -117,9 +147,18 @@ function SuccessModal({
               {title}
             </h2>
             <p className="mt-2 text-sm text-slate-600">{message}</p>
-            <p className="mt-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 font-mono text-sm font-semibold text-green-800">
-              {trackingId}
-            </p>
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
+              <p className="font-mono text-sm font-semibold text-green-800">{trackingId}</p>
+              <button
+                type="button"
+                onClick={handleCopyTrackingId}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-green-300 bg-white text-green-800 transition hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300"
+                aria-label={isCopied ? 'Tracking ID copied' : 'Copy tracking ID'}
+                title={isCopied ? 'Copied' : 'Copy tracking ID'}
+              >
+                {isCopied ? <FiCheck /> : <FiCopy />}
+              </button>
+            </div>
           </div>
         </div>
 

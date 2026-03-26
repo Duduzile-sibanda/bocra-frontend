@@ -23,7 +23,12 @@ function FeaturedNewsCard({ article, onOpen, onHoverChange }: FeaturedNewsCardPr
       onMouseLeave={() => onHoverChange(false)}
       className="group w-full overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
     >
-      <div className={`h-56 w-full bg-gradient-to-br ${article.imageThemeClass} md:h-64`} aria-hidden="true" />
+      <img
+        src={article.imageSrc}
+        alt={article.imageAlt}
+        className="h-56 w-full object-cover md:h-64"
+        loading="lazy"
+      />
       <div className="space-y-3 p-6">
         <div className="flex flex-wrap items-center gap-3 text-xs font-semibold tracking-wide text-slate-600">
           <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">{article.category}</span>

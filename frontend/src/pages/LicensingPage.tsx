@@ -5,6 +5,7 @@ import LicenseTrackingModal from '../components/licensing/LicenseTrackingModal'
 import LicenseVerificationModal from '../components/licensing/LicenseVerificationModal'
 import UploadModal, { type UploadPayload } from '../components/licensing/UploadModal'
 import ActionButton from '../components/ui/ActionButton'
+import { useLicensingStore } from '../stores/licensingStore'
 
 type LicenseOption = {
   id: string
@@ -626,13 +627,23 @@ function UploadSection({ selectedLicense, onOpenUpload, onOpenSelection, onOpenT
 }
 
 function LicensingPage() {
-  const [selectedLicenseId, setSelectedLicenseId] = useState<string>('')
-  const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false)
-  const [isVerificationOpen, setIsVerificationOpen] = useState<boolean>(false)
-  const [isTrackingOpen, setIsTrackingOpen] = useState<boolean>(false)
-  const [isSubmittingUpload, setIsSubmittingUpload] = useState<boolean>(false)
-  const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false)
-  const [trackingId, setTrackingId] = useState<string>('')
+  const selectedLicenseId = useLicensingStore((state) => state.selectedLicenseId)
+  const setSelectedLicenseId = useLicensingStore((state) => state.setSelectedLicenseId)
+  const isUploadOpen = useLicensingStore((state) => state.isUploadOpen)
+  const openUpload = useLicensingStore((state) => state.openUpload)
+  const closeUpload = useLicensingStore((state) => state.closeUpload)
+  const isVerificationOpen = useLicensingStore((state) => state.isVerificationOpen)
+  const openVerification = useLicensingStore((state) => state.openVerification)
+  const closeVerification = useLicensingStore((state) => state.closeVerification)
+  const isTrackingOpen = useLicensingStore((state) => state.isTrackingOpen)
+  const openTracking = useLicensingStore((state) => state.openTracking)
+  const closeTracking = useLicensingStore((state) => state.closeTracking)
+  const isSubmittingUpload = useLicensingStore((state) => state.isSubmittingUpload)
+  const startUploadSubmit = useLicensingStore((state) => state.startUploadSubmit)
+  const finishUploadSubmit = useLicensingStore((state) => state.finishUploadSubmit)
+  const isSuccessOpen = useLicensingStore((state) => state.isSuccessOpen)
+  const closeSuccess = useLicensingStore((state) => state.closeSuccess)
+  const trackingId = useLicensingStore((state) => state.trackingId)
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [activeIndex, setActiveIndex] = useState<number>(0)
 
@@ -665,21 +676,6 @@ function LicensingPage() {
   const totalSections = sections.length
   const detailIndex = sections.findIndex((section) => section.id === 'detail')
   const uploadIndex = sections.findIndex((section) => section.id === 'upload')
-
-  useEffect(() => {
-    const storedLicenseId = window.localStorage.getItem('bocra_selected_license_id')
-    if (storedLicenseId && LICENSE_OPTIONS.some((license) => license.id === storedLicenseId)) {
-      setSelectedLicenseId(storedLicenseId)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!selectedLicenseId) {
-      window.localStorage.removeItem('bocra_selected_license_id')
-      return
-    }
-    window.localStorage.setItem('bocra_selected_license_id', selectedLicenseId)
-  }, [selectedLicenseId])
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -786,7 +782,7 @@ function LicensingPage() {
   }
 
   const handleUploadSubmit = async (payload: UploadPayload) => {
-    setIsSubmittingUpload(true)
+    startUploadSubmit()
 
     // Simulate server processing before returning a tracking reference.
     await new Promise((resolve) => window.setTimeout(resolve, 1200))
@@ -801,10 +797,7 @@ function LicensingPage() {
         licenseType: selectedLicense?.name ?? 'Not provided',
       }),
     )
-    setTrackingId(nextTrackingId)
-    setIsUploadOpen(false)
-    setIsSuccessOpen(true)
-    setIsSubmittingUpload(false)
+    finishUploadSubmit(nextTrackingId)
   }
 
   return (
@@ -825,8 +818,8 @@ function LicensingPage() {
           <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
             <IntroSection
               onGetStarted={() => scrollToSection(1)}
-              onOpenVerification={() => setIsVerificationOpen(true)}
-              onOpenTracking={() => setIsTrackingOpen(true)}
+              onOpenVerification={openVerification}
+              onOpenTracking={openTracking}
             />
           </div>
         </section>
@@ -872,9 +865,9 @@ function LicensingPage() {
           <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
             <UploadSection
               selectedLicense={selectedLicense}
-              onOpenUpload={() => setIsUploadOpen(true)}
+              onOpenUpload={openUpload}
               onOpenSelection={() => scrollToSection(1)}
-              onOpenTracking={() => setIsTrackingOpen(true)}
+              onOpenTracking={openTracking}
             />
           </div>
         </section>
@@ -928,21 +921,21 @@ function LicensingPage() {
         isOpen={isUploadOpen}
         isSubmitting={isSubmittingUpload}
         selectedLicenseName={selectedLicense?.name ?? ''}
-        onClose={() => setIsUploadOpen(false)}
+        onClose={closeUpload}
         onSubmit={handleUploadSubmit}
       />
 
-      <LicenseVerificationModal isOpen={isVerificationOpen} onClose={() => setIsVerificationOpen(false)} />
-      <LicenseTrackingModal isOpen={isTrackingOpen} onClose={() => setIsTrackingOpen(false)} />
+      <LicenseVerificationModal isOpen={isVerificationOpen} onClose={closeVerification} />
+      <LicenseTrackingModal isOpen={isTrackingOpen} onClose={closeTracking} />
 
       <SuccessModal
         isOpen={isSuccessOpen}
         trackingId={trackingId}
         title="Application Submitted Successfully"
         message="Your application has been submitted. A confirmation has been sent to your email. Use your email and tracking ID to check status."
-        onClose={() => setIsSuccessOpen(false)}
+        onClose={closeSuccess}
         onSubmitAnother={() => {
-          setIsSuccessOpen(false)
+          closeSuccess()
           scrollToSection(1)
         }}
         submitAnotherLabel="Submit Another Application"

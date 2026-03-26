@@ -7,17 +7,21 @@ import SuccessModal from '../components/complaints/SuccessModal'
 import TrackComplaintSection from '../components/complaints/TrackComplaintSection'
 import { complaintSections } from '../data/complaints'
 import type { ComplaintRecord } from '../types/complaints'
+import { useComplaintsStore } from '../stores/complaintsStore'
 
 type FlowSection = { id: string; type: 'info' | 'submit' | 'track' | 'status' }
 
 function ComplaintsPage() {
-  const [selectedRecord, setSelectedRecord] = useState<ComplaintRecord | null>(null)
+  const selectedRecord = useComplaintsStore((state) => state.selectedRecord)
+  const setSelectedRecord = useComplaintsStore((state) => state.setSelectedRecord)
+  const trackingSeedId = useComplaintsStore((state) => state.trackingSeedId)
+  const setTrackingSeedId = useComplaintsStore((state) => state.setTrackingSeedId)
+  const isSuccessOpen = useComplaintsStore((state) => state.isSuccessOpen)
+  const latestTrackingId = useComplaintsStore((state) => state.latestTrackingId)
+  const closeSuccessModal = useComplaintsStore((state) => state.closeSuccessModal)
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [activeIndex, setActiveIndex] = useState<number>(0)
   const [resetToken, setResetToken] = useState<number>(0)
-  const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false)
-  const [latestTrackingId, setLatestTrackingId] = useState<string>('')
-  const [trackingSeedId, setTrackingSeedId] = useState<string>('')
   const [feedbackModal, setFeedbackModal] = useState<{
     isOpen: boolean
     title: string
@@ -134,10 +138,7 @@ function ComplaintsPage() {
   }, [activeIndex, isMobile, totalSections])
 
   const handleSubmitSuccess = (record: ComplaintRecord) => {
-    setLatestTrackingId(record.trackingId)
     setTrackingSeedId(record.trackingId)
-    setIsSuccessOpen(true)
-    window.localStorage.setItem('bocra_last_tracking_id', record.trackingId)
   }
 
   return (
@@ -364,14 +365,14 @@ function ComplaintsPage() {
 
       <SuccessModal
         isOpen={isSuccessOpen}
-        onClose={() => setIsSuccessOpen(false)}
+        onClose={closeSuccessModal}
         trackingId={latestTrackingId}
         onTrackComplaint={() => {
-          setIsSuccessOpen(false)
+          closeSuccessModal()
           scrollToSection(trackIndex)
         }}
         onSubmitAnother={() => {
-          setIsSuccessOpen(false)
+          closeSuccessModal()
           setResetToken((current) => current + 1)
           scrollToSection(submitIndex)
         }}

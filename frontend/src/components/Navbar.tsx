@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { HiOutlineMagnifyingGlass, HiOutlineXMark } from 'react-icons/hi2'
+import { HiOutlineBars3, HiOutlineMagnifyingGlass, HiOutlineXMark } from 'react-icons/hi2'
 import Button from './Button'
 import styles from './Navbar.module.css'
-import logo from '../assets/logo1.svg'
+import logo from '../assets/bocra.png'
 import { SITE_SEARCH_INDEX } from '../data/siteSearch'
+import { rankSiteSearchEntries } from '../utils/siteSearchRanking'
 
 const navItems = [
   { label: 'Home', to: '/' },
@@ -13,7 +14,7 @@ const navItems = [
   { label: 'Projects', to: '/projects' },
   { label: 'Tenders', to: '/tenders' },
   { label: 'Licensing', to: '/licensing' },
-  { label: 'Legislation', to: '/legislation' },
+  { label: 'Documents', to: '/legislation' },
   { label: 'Complaints', to: '/complaints' },
 ]
 
@@ -23,34 +24,28 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 function Navbar() {
   const navigate = useNavigate()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(-1)
   const searchWrapperRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const results = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase()
-    if (!normalizedQuery) {
-      return SITE_SEARCH_INDEX.slice(0, 6)
-    }
-
-    return SITE_SEARCH_INDEX.map((entry) => {
-      const title = entry.title.toLowerCase()
-      const description = entry.description.toLowerCase()
-      const keywordText = entry.keywords.join(' ').toLowerCase()
-      let score = 0
-
-      if (title.includes(normalizedQuery)) score += 4
-      if (description.includes(normalizedQuery)) score += 2
-      if (keywordText.includes(normalizedQuery)) score += 3
-
-      return { entry, score }
-    })
-      .filter((item) => item.score > 0)
-      .sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title))
-      .slice(0, 8)
-      .map((item) => item.entry)
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 220)
+    return () => window.clearTimeout(timer)
   }, [searchQuery])
+
+  const results = useMemo(
+    () => rankSiteSearchEntries(SITE_SEARCH_INDEX, debouncedSearchQuery, 8),
+    [debouncedSearchQuery],
+  )
+
+  useEffect(() => {
+    setActiveIndex((prev) => (prev >= results.length ? -1 : prev))
+  }, [results.length])
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -82,9 +77,20 @@ function Navbar() {
     }
   }, [])
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const openResult = (path: string) => {
     navigate(path)
     setIsSearchOpen(false)
+    setIsMobileMenuOpen(false)
     setSearchQuery('')
   }
 
@@ -95,10 +101,30 @@ function Navbar() {
           <img alt="BOCRA Logo" className={styles.logo} src={logo} />
         </NavLink>
 
-        <div className={styles.rightGroup}>
+        <button
+          type="button"
+          className={styles.mobileMenuButton}
+          aria-label={isMobileMenuOpen ? 'Close main menu' : 'Open main menu'}
+          aria-expanded={isMobileMenuOpen}
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+        >
+          {isMobileMenuOpen ? (
+            <HiOutlineXMark className={styles.searchIcon} aria-hidden="true" />
+          ) : (
+            <HiOutlineBars3 className={styles.searchIcon} aria-hidden="true" />
+          )}
+        </button>
+
+        <div className={`${styles.rightGroup} ${isMobileMenuOpen ? styles.rightGroupOpen : ''}`.trim()}>
           <nav className={styles.navLinks} aria-label="Main navigation">
             {navItems.map((item) => (
-              <NavLink key={item.label} className={navLinkClass} end to={item.to}>
+              <NavLink
+                key={item.label}
+                className={navLinkClass}
+                end
+                to={item.to}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 {item.label}
               </NavLink>
             ))}
@@ -122,11 +148,11 @@ function Navbar() {
                 <div className={styles.searchInputRow}>
                   <HiOutlineMagnifyingGlass className={styles.searchIcon} aria-hidden="true" />
                   <input
-                    ref={inputRef}
-                    type="search"
-                    value={searchQuery}
-                    placeholder="Search pages, services, jobs, tenders..."
-                    className={styles.searchInput}
+                  ref={inputRef}
+                  type="search"
+                  value={searchQuery}
+                  placeholder="Search across pages, services, jobs, tenders..."
+                  className={styles.searchInput}
                     onChange={(event) => {
                       setSearchQuery(event.target.value)
                       setActiveIndex(-1)
@@ -140,9 +166,12 @@ function Navbar() {
                         event.preventDefault()
                         setActiveIndex((prev) => Math.max(prev - 1, 0))
                       }
-                      if (event.key === 'Enter' && results[activeIndex]) {
-                        event.preventDefault()
-                        openResult(results[activeIndex].path)
+                      if (event.key === 'Enter') {
+                        const selected = results[activeIndex] ?? results[0]
+                        if (selected) {
+                          event.preventDefault()
+                          openResult(selected.path)
+                        }
                       }
                     }}
                   />
@@ -188,7 +217,12 @@ function Navbar() {
           </div>
 
           <div className={styles.cta}>
-            <Button label="BSA Portal" to="/admin" variant="primary" />
+            <Button
+              label="BSA Portal"
+              to="/admin"
+              variant="primary"
+              className={styles.portalButton}
+            />
           </div>
         </div>
       </div>

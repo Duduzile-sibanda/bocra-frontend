@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { complaintCategories, type ComplaintFormValues, type ComplaintRecord } from '../../types/complaints'
-import { submitComplaint } from '../../utils/complaintsStorage'
+import { useComplaintsStore } from '../../stores/complaintsStore'
 import ActionButton from '../ui/ActionButton'
 import InputField from '../ui/InputField'
 
@@ -23,6 +23,7 @@ const initialValues: ComplaintFormValues = {
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function ComplaintSubmissionSection({ onSuccess, resetToken = 0 }: ComplaintSubmissionSectionProps) {
+  const submitComplaint = useComplaintsStore((state) => state.submitComplaint)
   const [values, setValues] = useState<ComplaintFormValues>(initialValues)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)

@@ -6,6 +6,6 @@ export interface NewsArticle {
   summary: string
   readTime: string
   imageAlt: string
-  imageThemeClass: string
+  imageSrc: string
   content: string[]
 }

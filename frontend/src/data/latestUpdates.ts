@@ -1,4 +1,8 @@
 import type { NewsArticle } from '../types/news'
+import buildingImage from '../assets/building.jpg'
+import newsImage from '../assets/news.jpg'
+import signboardImage from '../assets/signboard.jpg'
+import updatesImage from '../assets/updates.jpg'
 
 export const latestUpdatesMock: NewsArticle[] = [
   {
@@ -9,8 +13,8 @@ export const latestUpdatesMock: NewsArticle[] = [
     summary:
       'BOCRA has published updated licensing requirements with clarified eligibility, documentation standards, and revised processing expectations for applicants.',
     readTime: '4 min read',
-    imageAlt: 'Licensing update graphic',
-    imageThemeClass: 'from-blue-700 via-blue-600 to-cyan-500',
+    imageAlt: 'BOCRA updates image',
+    imageSrc: updatesImage,
     content: [
       'BOCRA has released revised licensing requirements to improve clarity for applicants across regulated sectors.',
       'The update provides clearer documentation requirements, a simplified submission checklist, and refined application validation criteria.',
@@ -25,8 +29,8 @@ export const latestUpdatesMock: NewsArticle[] = [
     summary:
       'A refined complaint workflow introduces clearer status milestones and tighter response coordination between service providers and BOCRA teams.',
     readTime: '3 min read',
-    imageAlt: 'Consumer complaint handling illustration',
-    imageThemeClass: 'from-rose-700 via-rose-600 to-orange-500',
+    imageAlt: 'BOCRA signboard',
+    imageSrc: signboardImage,
     content: [
       'BOCRA has strengthened its complaint handling process with more visible status milestones for consumers.',
       'The revised timeline supports faster triage, clearer escalation paths, and improved accountability for provider responses.',
@@ -41,8 +45,8 @@ export const latestUpdatesMock: NewsArticle[] = [
     summary:
       'Operators have advised BOCRA of temporary service interruptions in selected regions due to planned infrastructure maintenance windows.',
     readTime: '2 min read',
-    imageAlt: 'Public notice announcement graphic',
-    imageThemeClass: 'from-slate-700 via-slate-600 to-slate-400',
+    imageAlt: 'News headline visual',
+    imageSrc: newsImage,
     content: [
       'BOCRA has received notifications of temporary service disruptions in select areas linked to planned maintenance activity.',
       'The maintenance windows are intended to strengthen network resilience and improve service quality in the medium term.',
@@ -57,8 +61,8 @@ export const latestUpdatesMock: NewsArticle[] = [
     summary:
       'A new regulatory briefing outlines enhancements to spectrum coordination procedures to support efficient allocation and reduced interference.',
     readTime: '5 min read',
-    imageAlt: 'Spectrum management update graphic',
-    imageThemeClass: 'from-emerald-700 via-emerald-600 to-teal-500',
+    imageAlt: 'BOCRA offices',
+    imageSrc: buildingImage,
     content: [
       'BOCRA has issued a spectrum management update to improve allocation transparency and coordination workflows.',
       'The update focuses on reducing harmful interference, improving assignment predictability, and supporting sector growth.',

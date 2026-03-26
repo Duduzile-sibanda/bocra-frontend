@@ -20,7 +20,12 @@ function NewsCard({ article, onOpen }: NewsCardProps) {
       onClick={() => onOpen(article)}
       className="group grid w-full grid-cols-[112px_1fr] gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 sm:grid-cols-[132px_1fr]"
     >
-      <div className={`h-full min-h-24 rounded-xl bg-gradient-to-br ${article.imageThemeClass}`} aria-hidden="true" />
+      <img
+        src={article.imageSrc}
+        alt={article.imageAlt}
+        className="h-full min-h-24 w-full rounded-xl object-cover"
+        loading="lazy"
+      />
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
           <span className="rounded-full bg-slate-100 px-2 py-0.5 normal-case text-slate-700">{article.category}</span>
