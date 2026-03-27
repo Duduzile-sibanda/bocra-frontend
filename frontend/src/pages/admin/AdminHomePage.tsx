@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from './AdminHomePage.module.css'
 import bocraLogo from '../../assets/logo1.svg'
+import buildingBg from '../../assets/building.jpg'
 
 type AdminStats = {
   pendingComplaints: number
@@ -105,7 +106,15 @@ function AdminHomePage() {
         </div>
       </aside>
 
-      <main className={styles.mainContent}>
+      <main 
+        className={styles.mainContent}
+        style={{ 
+          backgroundImage: `linear-gradient(rgba(240, 247, 255, 0.88), rgba(240, 247, 255, 0.88)), url(${buildingBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <header className={styles.topBar}>
           <button
             className={styles.menuToggle}
@@ -114,14 +123,27 @@ function AdminHomePage() {
           >
             ☰
           </button>
-          <h1 className={styles.pageTitle}>Dashboard</h1>
+          <h1 className={styles.pageTitle}>Admin Control Center</h1>
           <div className={styles.headerFiller} />
+          <div className={styles.topBarActions}>
+            <div className={styles.userBadge}>
+              <span>System Admin</span>
+              <div className={styles.avatarCircle}>SA</div>
+            </div>
+          </div>
         </header>
 
         <div className={styles.contentContainer}>
           <section className={styles.welcomeSection}>
-            <h2>Welcome to the Admin Dashboard</h2>
-            <p>Manage all aspects of the BOCRA Digital Service Platform efficiently and effectively.</p>
+            <div className={styles.welcomeText}>
+              <h2>System Overview</h2>
+              <p className={styles.dateDisplay}>
+                {new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            </div>
+            <button className={styles.primaryActionBtn} onClick={() => navigate('/admin/analytics')}>
+              📊 Generate Report
+            </button>
           </section>
 
           <div className={styles.statsContainer}>
@@ -146,6 +168,39 @@ function AdminHomePage() {
                 <p className={styles.statValue}>{stats.publishedContent}</p>
               </div>
             </article>
+          </div>
+
+          <div className={styles.dashboardGrid}>
+            <section className={styles.infoCard}>
+              <h3>Recent System Activity</h3>
+              <div className={styles.activityFeed}>
+                <div className={styles.activityLine}>
+                  <span className={styles.dot} />
+                  <p>New license application submitted by <strong>Liquid Intelligent Tech</strong></p>
+                  <small>1 hour ago</small>
+                </div>
+                <div className={styles.activityLine}>
+                  <span className={styles.dot} />
+                  <p>Complaint #004 status updated to <strong>Resolved</strong></p>
+                  <small>3 hours ago</small>
+                </div>
+                <div className={styles.activityLine}>
+                  <span className={styles.dot} />
+                  <p>New advisory published: <em>"Network Quality Guidelines 2026"</em></p>
+                  <small>Yesterday</small>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.infoCard}>
+              <h3>Quick Navigation</h3>
+              <div className={styles.shortcutGrid}>
+                <Link to="/admin/complaints" className={styles.shortcut}>Resolve Pending Issues</Link>
+                <Link to="/admin/licensing" className={styles.shortcut}>Review Applications</Link>
+                <Link to="/admin/content" className={styles.shortcut}>Update Public Portal</Link>
+                <Link to="/admin/users" className={styles.shortcut}>Manage Staff Permissions</Link>
+              </div>
+            </section>
           </div>
         </div>
       </main>
