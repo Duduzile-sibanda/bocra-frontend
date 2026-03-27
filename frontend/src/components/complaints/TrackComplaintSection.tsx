@@ -9,6 +9,7 @@ type TrackComplaintSectionProps = {
   onFound: (record: ComplaintRecord) => void
   onInvalidId: () => void
   onNotFound: (trackingId: string) => void
+  onLookupError?: (message: string) => void
 }
 
 function TrackComplaintSection({
@@ -16,6 +17,7 @@ function TrackComplaintSection({
   onFound,
   onInvalidId,
   onNotFound,
+  onLookupError,
 }: TrackComplaintSectionProps) {
   const [trackingId, setTrackingId] = useState<string>(initialTrackingId)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -24,7 +26,7 @@ function TrackComplaintSection({
     setTrackingId(initialTrackingId)
   }, [initialTrackingId])
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const normalized = trackingId.trim()
 
@@ -34,33 +36,36 @@ function TrackComplaintSection({
     }
 
     setIsLoading(true)
-
-    window.setTimeout(() => {
-      const record = getComplaintByTrackingId(normalized)
-      setIsLoading(false)
+    try {
+      const record = await getComplaintByTrackingId(normalized)
       if (!record) {
         onNotFound(normalized)
         return
       }
       onFound(record)
-    }, 600)
+    } catch (error) {
+      const fallback = 'Unable to retrieve complaint status right now. Please try again.'
+      onLookupError?.(error instanceof Error && error.message ? error.message : fallback)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Track Complaint</h1>
       <p className="mt-2 max-w-2xl text-sm text-slate-600 md:text-base">
-        Enter your tracking ID to check the latest complaint status.
+        Enter your complaint reference ID to check the latest status.
       </p>
 
       <form className="mt-6 grid max-w-xl gap-4" noValidate onSubmit={onSubmit}>
         <InputField
           id="track-complaint-id"
-          label="Tracking ID"
+          label="Reference ID"
           value={trackingId}
           onChange={setTrackingId}
           required
-          placeholder="BOCRA-YYYYMMDD-1234"
+          placeholder="Complaint reference ID (e.g. 123)"
         />
         <div>
           <ActionButton isLoading={isLoading} type="submit">

@@ -25,7 +25,7 @@ type FormErrors = {
 }
 
 const ANIMATION_MS = 180
-const MAX_FILE_SIZE_MB = 10
+const MAX_FILE_SIZE_MB = 5
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 function isPdfFile(file: File): boolean {
@@ -234,15 +234,14 @@ function UploadModal({ isOpen, isSubmitting, selectedLicenseName, onClose, onSub
               aria-describedby="license-file-help"
             />
             <p id="license-file-help" className={`text-xs ${errors.file ? 'text-red-700' : 'text-slate-600'}`}>
-              {errors.file
-                ? errors.file
-                : `Accepted format: PDF only. Maximum file size: ${MAX_FILE_SIZE_MB}MB.`}
+              {errors.file ? errors.file : `Upload completed PDF form (max ${MAX_FILE_SIZE_MB}MB)`}
             </p>
+            {file ? <p className="text-xs text-slate-600">Selected file: {file.name}</p> : null}
           </div>
 
           <div className="mt-2 flex flex-wrap gap-2">
-            <ActionButton type="submit" isLoading={isSubmitting}>
-              Submit Application
+            <ActionButton type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Application'}
             </ActionButton>
             <ActionButton type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
               Cancel
