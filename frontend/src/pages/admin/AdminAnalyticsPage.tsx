@@ -63,7 +63,7 @@ function AdminAnalyticsPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.contentContainer}>
       <div className={styles.headerRow}>
         <h1>Analytics Dashboard</h1>
       </div>

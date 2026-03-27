@@ -1,0 +1,77 @@
+.page {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  background: #1a202c;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease;
+}
+
+.sidebarClosed { width: 80px; }
+
+.logoContainer {
+  padding: 25px 15px;
+  background: rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.logo { max-width: 100%; height: auto; }
+
+.sidebarNav { flex: 1; padding: 20px 0; }
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  color: #a0aec0;
+  text-decoration: none;
+  font-weight: 500;
+  border-left: 4px solid transparent;
+  transition: all 0.2s;
+}
+
+.navItem:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #00BCD4;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 188, 212, 0.2);
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00BCD4, #E91E63);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.headerFiller { flex: 1; }
+
+.contentWrapper {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}

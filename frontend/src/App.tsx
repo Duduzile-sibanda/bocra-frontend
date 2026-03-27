@@ -12,10 +12,14 @@ import LicensingPage from './pages/LicensingPage'
 import ProjectsPage from './pages/ProjectsPage'
 import TendersPage from './pages/TendersPage'
 import TrackComplaintPage from './pages/TrackComplaintPage'
+<<<<<<< HEAD
 import PostalPage from './pages/PostalPage'
 import InternetPage from './pages/InternetPage'
 import BroadcastingPage from './pages/BroadcastingPage'
 import TelecommunicationsPage from './pages/TelecommunicationsPage'
+=======
+import AdminLayout from './pages/admin/AdminLayout'
+>>>>>>> f011971 (SIDEBAR _ADMINPAGES)
 import AdminHomePage from './pages/admin/AdminHomePage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
 import AdminComplaintsPage from './pages/admin/AdminComplaintsPage'
@@ -49,14 +53,16 @@ function App() {
           <Route path="/complaints" element={<ComplaintsPage />} />
           <Route path="/complaints/track" element={<TrackComplaintPage />} />
           <Route path="/complaints/status/:trackingId" element={<ComplaintStatusPage />} />
-          <Route path="/admin" element={<AdminHomePage />} />
-          <Route path="/admin/dashboard" element={<AdminHomePage />} />
-          <Route path="/admin/complaints" element={<AdminComplaintsPage />} />
-          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
-          <Route path="/admin/content" element={<AdminContentPage />} />
-          <Route path="/admin/licensing" element={<AdminLicensingPage />} />
-          <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
-          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminHomePage />} />
+            <Route path="dashboard" element={<AdminHomePage />} />
+            <Route path="complaints" element={<AdminComplaintsPage />} />
+            <Route path="analytics" element={<AdminAnalyticsPage />} />
+            <Route path="content" element={<AdminContentPage />} />
+            <Route path="licensing" element={<AdminLicensingPage />} />
+            <Route path="notifications" element={<AdminNotificationsPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
