@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer.jsx'
 import styles from './App.module.css'
@@ -25,10 +25,15 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function App() {
+  const location = useLocation()
+  
+  // Determine if we are on any admin related page
+  const isAdminPage = location.pathname.startsWith('/admin')
+
   return (
     <div className={styles.app}>
-      <Navbar />
-      <main className={styles.content}>
+      {!isAdminPage && <Navbar />}
+      <main className={isAdminPage ? "" : styles.content}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -55,7 +60,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <Footer />
+      {!isAdminPage && <Footer />}
     </div>
   )
 }
