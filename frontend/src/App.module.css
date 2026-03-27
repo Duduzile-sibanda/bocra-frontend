@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: var(--page-background);
   color: #10243e;
+  overflow-x: hidden;
 }
 
 .content {

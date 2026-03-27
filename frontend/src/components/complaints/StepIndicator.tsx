@@ -7,7 +7,10 @@ type StepIndicatorProps = {
 
 function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   return (
-    <div aria-label="Complaint progress" className="w-full overflow-x-auto">
+    <div
+      aria-label="Complaint progress"
+      className="w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
       <ol className="mx-auto flex min-w-[520px] items-start justify-between gap-2">
         {steps.map((step, index) => {
           const isComplete = index < currentStep
