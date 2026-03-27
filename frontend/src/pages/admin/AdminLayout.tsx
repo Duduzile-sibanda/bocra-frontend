@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, Outlet } from 'react-router-dom'
 import styles from '../../pages/admin/AdminLayout.module.css'
 import bocraLogo from '../../assets/logo1.svg'
-import buildingBg from '../../assets/BUILDING.JPG'
+import buildingBg from '../../assets/building.jpg'
 
 function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
