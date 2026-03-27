@@ -711,6 +711,29 @@ function LicensingPage() {
 
     const handleWheel = (event: WheelEvent) => {
       if (isMobile) return
+
+      let scrollableAncestor: HTMLElement | null = event.target as HTMLElement | null
+      while (scrollableAncestor && scrollableAncestor !== container) {
+        const style = window.getComputedStyle(scrollableAncestor)
+        const supportsVerticalScroll =
+          /(auto|scroll)/.test(style.overflowY) &&
+          scrollableAncestor.scrollHeight > scrollableAncestor.clientHeight + 1
+
+        if (supportsVerticalScroll) {
+          const canScrollDown =
+            event.deltaY > 0 &&
+            scrollableAncestor.scrollTop + scrollableAncestor.clientHeight <
+              scrollableAncestor.scrollHeight - 1
+          const canScrollUp = event.deltaY < 0 && scrollableAncestor.scrollTop > 0
+
+          if (canScrollDown || canScrollUp) {
+            return
+          }
+        }
+
+        scrollableAncestor = scrollableAncestor.parentElement
+      }
+
       event.preventDefault()
       container.scrollBy({ left: event.deltaY + event.deltaX, behavior: 'smooth' })
     }
@@ -815,7 +838,7 @@ function LicensingPage() {
             isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
           }`}
         >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
             <IntroSection
               onGetStarted={() => scrollToSection(1)}
               onOpenVerification={openVerification}
@@ -831,7 +854,7 @@ function LicensingPage() {
               : 'w-screen shrink-0 overflow-y-auto bg-slate-200/70'
           }`}
         >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 py-14 pb-24 md:px-10 md:py-16 md:pb-24">
+          <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
             <LicenseSelectionSection
               licenses={LICENSE_OPTIONS}
               selectedLicenseId={selectedLicenseId}
@@ -846,7 +869,7 @@ function LicensingPage() {
               isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
             }`}
           >
-            <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+            <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
               <LicenseDetailSection
                 selectedLicense={selectedLicense?.infoOnly ? selectedLicense : undefined}
                 onProceedToUpload={() => scrollToSection(uploadIndex)}
@@ -862,7 +885,7 @@ function LicensingPage() {
             isMobile ? 'w-full overflow-y-auto bg-slate-200/70' : 'w-screen shrink-0 bg-slate-200/70'
           }`}
         >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
             <UploadSection
               selectedLicense={selectedLicense}
               onOpenUpload={openUpload}

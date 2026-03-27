@@ -114,6 +114,21 @@ function ComplaintsPage() {
 
     const handleWheel = (event: WheelEvent) => {
       if (isMobile) return
+
+      const target = event.target as HTMLElement | null
+      const sectionElement = target?.closest<HTMLElement>('[data-flow-section]')
+
+      if (sectionElement) {
+        const canScrollDown =
+          event.deltaY > 0 &&
+          sectionElement.scrollTop + sectionElement.clientHeight < sectionElement.scrollHeight - 1
+        const canScrollUp = event.deltaY < 0 && sectionElement.scrollTop > 0
+
+        if (canScrollDown || canScrollUp) {
+          return
+        }
+      }
+
       event.preventDefault()
       container.scrollBy({
         left: event.deltaY + event.deltaX,
@@ -190,7 +205,7 @@ function ComplaintsPage() {
                   : `h-[100svh] w-screen shrink-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${bgShade}`
               }`}
             >
-              <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 py-14 md:px-10 md:py-16">
+              <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
                 {sectionMeta.type === 'info' && infoSection ? (
                   <div className="w-full py-2 md:py-4">
                     <h1 className="text-balance text-3xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
