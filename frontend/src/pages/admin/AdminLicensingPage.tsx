@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import styles from './AdminLicensingPage.module.css'
 
 type LicenseStatus = 'pending' | 'approved' | 'rejected' | 'issued'
@@ -125,13 +124,10 @@ function AdminLicensingPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
+    <div className={styles.contentContainer}>
+      <div className={styles.headerRow}>
         <h1>Licensing Management</h1>
-        <Link to="/admin" className={styles.backButton}>
-          {'\u2190'} Back to Dashboard
-        </Link>
-      </header>
+      </div>
 
       <div className={styles.container}>
         <section className={styles.filterSection}>
@@ -301,10 +297,6 @@ function AdminLicensingPage() {
           </div>
         </div>
       )}
-
-      <footer className={styles.footer}>
-        <p>&copy; 2026 BOCRA Digital Service Platform. All rights reserved.</p>
-      </footer>
     </div>
   )
 }

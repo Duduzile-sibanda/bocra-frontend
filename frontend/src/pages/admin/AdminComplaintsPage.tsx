@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import styles from './AdminComplaintsPage.module.css'
 
 type ComplaintStatus = 'submitted' | 'under-review' | 'resolved' | 'rejected'
@@ -107,13 +106,10 @@ function AdminComplaintsPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
+    <div className={styles.contentContainer}>
+      <div className={styles.headerRow}>
         <h1>Complaint Management</h1>
-        <Link to="/admin" className={styles.backButton}>
-          {'\u2190'} Back to Dashboard
-        </Link>
-      </header>
+      </div>
 
       <div className={styles.container}>
         <section className={styles.filterSection}>
@@ -233,10 +229,6 @@ function AdminComplaintsPage() {
           </div>
         </div>
       )}
-
-      <footer className={styles.footer}>
-        <p>&copy; 2026 BOCRA Digital Service Platform. All rights reserved.</p>
-      </footer>
     </div>
   )
 }

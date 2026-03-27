@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import styles from './AdminNotificationsPage.module.css'
 
 type NotificationType = 'announcement' | 'update' | 'alert'
@@ -173,13 +172,10 @@ function AdminNotificationsPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
+    <div className={styles.contentContainer}>
+      <div className={styles.headerRow}>
         <h1>Notifications Management</h1>
-        <Link to="/admin" className={styles.backButton}>
-          {'\u2190'} Back to Dashboard
-        </Link>
-      </header>
+      </div>
 
       <div className={styles.container}>
         <div className={styles.actionSection}>
@@ -379,10 +375,6 @@ function AdminNotificationsPage() {
           </div>
         </div>
       )}
-
-      <footer className={styles.footer}>
-        <p>&copy; 2026 BOCRA Digital Service Platform. All rights reserved.</p>
-      </footer>
     </div>
   )
 }

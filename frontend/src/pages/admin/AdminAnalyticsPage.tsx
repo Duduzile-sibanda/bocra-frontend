@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import styles from './AdminAnalyticsPage.module.css'
 
 type StatCard = {
@@ -65,12 +64,9 @@ function AdminAnalyticsPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
+      <div className={styles.headerRow}>
         <h1>Analytics Dashboard</h1>
-        <Link to="/admin" className={styles.backButton}>
-          {'\u2190'} Back to Dashboard
-        </Link>
-      </header>
+      </div>
 
       <div className={styles.container}>
         <section className={styles.dateFilter}>
@@ -265,10 +261,6 @@ function AdminAnalyticsPage() {
           </button>
         </section>
       </div>
-
-      <footer className={styles.footer}>
-        <p>&copy; 2026 BOCRA Digital Service Platform. All rights reserved.</p>
-      </footer>
     </div>
   )
 }
