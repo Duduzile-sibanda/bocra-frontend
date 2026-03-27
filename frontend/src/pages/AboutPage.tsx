@@ -2,6 +2,70 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 import { aboutSections } from '../data/about'
 
+type BoardMember = {
+  name: string
+  role: string
+}
+
+type ExecutiveMember = {
+  name: string
+  role: string
+}
+
+const BOARD_MEMBERS: BoardMember[] = [
+  { name: 'Dr. Bokamoso Basutli', role: 'Chairperson' },
+  { name: 'Mr. Moabi Pusumane', role: 'Vice Chairperson' },
+  { name: 'Ms. Montle Phuthego', role: 'Board Member' },
+  { name: 'Ms. Alta Dimpho Seleka', role: 'Board Member' },
+  { name: 'Ms. Lebogang George', role: 'Board Member' },
+  { name: 'Mr. Ronald Kgafela', role: 'Board Member' },
+  { name: 'Dr. Kennedy Ramojela', role: 'Board Member' },
+]
+
+const EXECUTIVE_MEMBERS: ExecutiveMember[] = [
+  { name: 'Mr. Martin Mokgware', role: 'Chief Executive' },
+  { name: 'Mr. Murphy Setshwane', role: 'Director Business Development' },
+  { name: 'Mr. Peter Tladinyane', role: 'Director Corporate Services' },
+  { name: 'Ms. Bonnie Mine', role: 'Director Finance' },
+  { name: 'Mr. Bathopi Luke', role: 'Director Technical Services' },
+  { name: 'Ms. Tebogo Mmoshe', role: 'Director of Licensing' },
+  { name: 'Ms. Maitseo Ratladi', role: 'Director Broadband and Universal Service' },
+  { name: 'Ms. Joyce Isa-Molwane', role: 'Director Legal, Compliance and Board Secretary' },
+]
+
+const ASSET_IMAGES = import.meta.glob('../assets/people/*.{png,jpg,jpeg,PNG,JPG,JPEG}', {
+  eager: true,
+  import: 'default',
+}) as Record<string, string>
+
+const normalizeText = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const stripPersonPrefixes = (value: string) =>
+  normalizeText(value).replace(/^(mr|mrs|ms|dr|prof)\s+/, '')
+
+const getBoardImageByName = (name: string) => {
+  const normalizedName = stripPersonPrefixes(name)
+  const matchedEntry = Object.entries(ASSET_IMAGES).find(([path]) => {
+    const fileName = path.split('/').pop() ?? path
+    const normalizedFile = stripPersonPrefixes(fileName)
+    return normalizedFile.includes(normalizedName) || normalizedName.includes(normalizedFile)
+  })
+  return matchedEntry ? matchedEntry[1] : null
+}
+
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('')
+
 function AboutPage() {
   const sections = useMemo(() => aboutSections, [])
 
@@ -112,12 +176,12 @@ function AboutPage() {
               key={section.id}
               className={`snap-start ${
                 isMobile
-                  ? `h-[100svh] w-full ${bgShade}`
-                  : `h-[100svh] w-screen shrink-0 ${bgShade}`
+                  ? `h-[100svh] w-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${bgShade}`
+                  : `h-[100svh] w-screen shrink-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${bgShade}`
               }`}
             >
               <div
-                className={`mx-auto flex h-full w-full max-w-6xl items-center px-6 py-16 md:px-10 ${
+                className={`mx-auto flex min-h-full w-full max-w-6xl items-start px-6 pb-28 pt-16 md:px-10 md:pb-32 md:pt-20 ${
                   activeIndex === index ? 'opacity-100 translate-y-0' : 'opacity-95 translate-y-2'
                 } transition-all duration-500`}
               >
@@ -129,16 +193,87 @@ function AboutPage() {
                     {section.summary}
                   </p>
 
-                  {section.bullets.length > 0 ? (
+                  {section.id === 'board-of-directors' ? (
+                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {BOARD_MEMBERS.map((member) => {
+                        const imageSrc = getBoardImageByName(member.name)
+                        return (
+                          <article
+                            key={member.name}
+                            className="rounded-2xl border border-slate-300/70 bg-white/70 p-4 text-center shadow-sm backdrop-blur-sm"
+                          >
+                            {imageSrc ? (
+                              <img
+                                src={imageSrc}
+                                alt={member.name}
+                                className="mx-auto h-40 w-full rounded-xl object-cover object-top"
+                              />
+                            ) : (
+                              <div className="mx-auto flex h-40 w-full items-center justify-center rounded-xl bg-slate-200 text-2xl font-bold text-slate-600">
+                                {getInitials(member.name)}
+                              </div>
+                            )}
+                            <p className="mt-3 text-base font-extrabold tracking-tight text-slate-900">
+                              {member.name}
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-slate-600">{member.role}</p>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  ) : null}
+
+                  {section.id === 'executive-management' ? (
+                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {EXECUTIVE_MEMBERS.map((member) => {
+                        const imageSrc = getBoardImageByName(member.name)
+                        return (
+                          <article
+                            key={member.name}
+                            className="rounded-2xl border border-slate-300/70 bg-white/70 p-4 text-center shadow-sm backdrop-blur-sm"
+                          >
+                            {imageSrc ? (
+                              <img
+                                src={imageSrc}
+                                alt={member.name}
+                                className="mx-auto h-40 w-full rounded-xl object-cover object-top"
+                              />
+                            ) : (
+                              <div className="mx-auto flex h-40 w-full items-center justify-center rounded-xl bg-slate-200 text-2xl font-bold text-slate-600">
+                                {getInitials(member.name)}
+                              </div>
+                            )}
+                            <p className="mt-3 text-base font-extrabold tracking-tight text-slate-900">
+                              {member.name}
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-slate-600">{member.role}</p>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  ) : null}
+
+                  {section.bullets.length > 0 &&
+                  section.id !== 'board-of-directors' &&
+                  section.id !== 'executive-management' ? (
                     <ul className="mt-6 grid gap-3 md:grid-cols-2">
-                      {section.bullets.map((point) => (
-                        <li
-                          key={point}
-                          className="list-disc text-sm leading-relaxed text-slate-700 md:ml-6 md:text-base"
-                        >
-                          {point}
-                        </li>
-                      ))}
+                      {section.bullets.map((point) =>
+                        section.id === 'organogram' && point === 'Organisational Objectives' ? (
+                          <li
+                            key={point}
+                            className="col-span-full mt-2 list-none text-base font-extrabold tracking-tight text-slate-900"
+                          >
+                            {point}
+                          </li>
+                        ) : (
+                          <li
+                            key={point}
+                            className="list-disc text-sm leading-relaxed text-slate-700 md:ml-6 md:text-base"
+                          >
+                            {point}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   ) : null}
                 </div>

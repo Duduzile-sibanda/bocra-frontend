@@ -5,6 +5,7 @@ import LicenseTrackingModal from '../components/licensing/LicenseTrackingModal'
 import LicenseVerificationModal from '../components/licensing/LicenseVerificationModal'
 import UploadModal, { type UploadPayload } from '../components/licensing/UploadModal'
 import ActionButton from '../components/ui/ActionButton'
+import { useLicensingStore } from '../stores/licensingStore'
 
 type LicenseOption = {
   id: string
@@ -626,13 +627,23 @@ function UploadSection({ selectedLicense, onOpenUpload, onOpenSelection, onOpenT
 }
 
 function LicensingPage() {
-  const [selectedLicenseId, setSelectedLicenseId] = useState<string>('')
-  const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false)
-  const [isVerificationOpen, setIsVerificationOpen] = useState<boolean>(false)
-  const [isTrackingOpen, setIsTrackingOpen] = useState<boolean>(false)
-  const [isSubmittingUpload, setIsSubmittingUpload] = useState<boolean>(false)
-  const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false)
-  const [trackingId, setTrackingId] = useState<string>('')
+  const selectedLicenseId = useLicensingStore((state) => state.selectedLicenseId)
+  const setSelectedLicenseId = useLicensingStore((state) => state.setSelectedLicenseId)
+  const isUploadOpen = useLicensingStore((state) => state.isUploadOpen)
+  const openUpload = useLicensingStore((state) => state.openUpload)
+  const closeUpload = useLicensingStore((state) => state.closeUpload)
+  const isVerificationOpen = useLicensingStore((state) => state.isVerificationOpen)
+  const openVerification = useLicensingStore((state) => state.openVerification)
+  const closeVerification = useLicensingStore((state) => state.closeVerification)
+  const isTrackingOpen = useLicensingStore((state) => state.isTrackingOpen)
+  const openTracking = useLicensingStore((state) => state.openTracking)
+  const closeTracking = useLicensingStore((state) => state.closeTracking)
+  const isSubmittingUpload = useLicensingStore((state) => state.isSubmittingUpload)
+  const startUploadSubmit = useLicensingStore((state) => state.startUploadSubmit)
+  const finishUploadSubmit = useLicensingStore((state) => state.finishUploadSubmit)
+  const isSuccessOpen = useLicensingStore((state) => state.isSuccessOpen)
+  const closeSuccess = useLicensingStore((state) => state.closeSuccess)
+  const trackingId = useLicensingStore((state) => state.trackingId)
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [activeIndex, setActiveIndex] = useState<number>(0)
 
@@ -667,21 +678,6 @@ function LicensingPage() {
   const uploadIndex = sections.findIndex((section) => section.id === 'upload')
 
   useEffect(() => {
-    const storedLicenseId = window.localStorage.getItem('bocra_selected_license_id')
-    if (storedLicenseId && LICENSE_OPTIONS.some((license) => license.id === storedLicenseId)) {
-      setSelectedLicenseId(storedLicenseId)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!selectedLicenseId) {
-      window.localStorage.removeItem('bocra_selected_license_id')
-      return
-    }
-    window.localStorage.setItem('bocra_selected_license_id', selectedLicenseId)
-  }, [selectedLicenseId])
-
-  useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     handleResize()
     window.addEventListener('resize', handleResize)
@@ -693,7 +689,15 @@ function LicensingPage() {
     if (!container) return
 
     const nextIndex = Math.min(Math.max(index, 0), totalSections - 1)
-    const offset = isMobile ? nextIndex * container.clientHeight : nextIndex * container.clientWidth
+    const sectionNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-flow-section]'))
+    const targetNode = sectionNodes[nextIndex]
+    const offset = targetNode
+      ? isMobile
+        ? targetNode.offsetTop
+        : targetNode.offsetLeft
+      : isMobile
+        ? nextIndex * container.clientHeight
+        : nextIndex * container.clientWidth
 
     container.scrollTo({
       top: isMobile ? offset : 0,
@@ -707,14 +711,52 @@ function LicensingPage() {
     if (!container) return
 
     const handleScroll = () => {
-      const size = isMobile ? container.clientHeight : container.clientWidth
+      const sectionNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-flow-section]'))
+      if (sectionNodes.length === 0) return
+
       const position = isMobile ? container.scrollTop : container.scrollLeft
-      const index = Math.round(position / Math.max(size, 1))
-      setActiveIndex(Math.min(Math.max(index, 0), totalSections - 1))
+      const viewportSize = isMobile ? container.clientHeight : container.clientWidth
+      const focalPoint = position + viewportSize * 0.35
+
+      let nearestIndex = 0
+      let nearestDistance = Number.POSITIVE_INFINITY
+      sectionNodes.forEach((node, idx) => {
+        const nodeStart = isMobile ? node.offsetTop : node.offsetLeft
+        const distance = Math.abs(nodeStart - focalPoint)
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearestIndex = idx
+        }
+      })
+
+      setActiveIndex(Math.min(Math.max(nearestIndex, 0), totalSections - 1))
     }
 
     const handleWheel = (event: WheelEvent) => {
       if (isMobile) return
+
+      let scrollableAncestor: HTMLElement | null = event.target as HTMLElement | null
+      while (scrollableAncestor && scrollableAncestor !== container) {
+        const style = window.getComputedStyle(scrollableAncestor)
+        const supportsVerticalScroll =
+          /(auto|scroll)/.test(style.overflowY) &&
+          scrollableAncestor.scrollHeight > scrollableAncestor.clientHeight + 1
+
+        if (supportsVerticalScroll) {
+          const canScrollDown =
+            event.deltaY > 0 &&
+            scrollableAncestor.scrollTop + scrollableAncestor.clientHeight <
+              scrollableAncestor.scrollHeight - 1
+          const canScrollUp = event.deltaY < 0 && scrollableAncestor.scrollTop > 0
+
+          if (canScrollDown || canScrollUp) {
+            return
+          }
+        }
+
+        scrollableAncestor = scrollableAncestor.parentElement
+      }
+
       event.preventDefault()
       container.scrollBy({ left: event.deltaY + event.deltaX, behavior: 'smooth' })
     }
@@ -786,7 +828,7 @@ function LicensingPage() {
   }
 
   const handleUploadSubmit = async (payload: UploadPayload) => {
-    setIsSubmittingUpload(true)
+    startUploadSubmit()
 
     // Simulate server processing before returning a tracking reference.
     await new Promise((resolve) => window.setTimeout(resolve, 1200))
@@ -801,10 +843,7 @@ function LicensingPage() {
         licenseType: selectedLicense?.name ?? 'Not provided',
       }),
     )
-    setTrackingId(nextTrackingId)
-    setIsUploadOpen(false)
-    setIsSuccessOpen(true)
-    setIsSubmittingUpload(false)
+    finishUploadSubmit(nextTrackingId)
   }
 
   return (
@@ -813,32 +852,34 @@ function LicensingPage() {
         ref={containerRef}
         className={`w-screen ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] ${
           isMobile
-            ? 'h-[100svh] overflow-y-auto overflow-x-hidden snap-y snap-mandatory'
+            ? 'min-h-[100svh] overflow-y-auto overflow-x-hidden'
             : 'h-[100svh] overflow-x-auto overflow-y-hidden snap-x snap-mandatory flex'
         } scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
       >
         <section
-          className={`snap-start min-w-[100vw] h-screen ${
-            isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
+          data-flow-section
+          className={`snap-start min-w-[100vw] ${
+            isMobile ? 'min-h-[100svh] w-full bg-slate-100' : 'h-screen w-screen shrink-0 bg-slate-100'
           }`}
         >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
             <IntroSection
               onGetStarted={() => scrollToSection(1)}
-              onOpenVerification={() => setIsVerificationOpen(true)}
-              onOpenTracking={() => setIsTrackingOpen(true)}
+              onOpenVerification={openVerification}
+              onOpenTracking={openTracking}
             />
           </div>
         </section>
 
         <section
-          className={`snap-start min-w-[100vw] h-screen ${
+          data-flow-section
+          className={`snap-start min-w-[100vw] ${
             isMobile
-              ? 'w-full overflow-y-auto bg-slate-200/70'
-              : 'w-screen shrink-0 overflow-y-auto bg-slate-200/70'
+              ? 'min-h-[100svh] w-full bg-slate-200/70'
+              : 'h-screen w-screen shrink-0 overflow-y-auto bg-slate-200/70'
           }`}
         >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 py-14 pb-24 md:px-10 md:py-16 md:pb-24">
+          <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
             <LicenseSelectionSection
               licenses={LICENSE_OPTIONS}
               selectedLicenseId={selectedLicenseId}
@@ -849,11 +890,12 @@ function LicensingPage() {
 
         {showDetailSection ? (
           <section
-            className={`snap-start min-w-[100vw] h-screen ${
-              isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
+            data-flow-section
+            className={`snap-start min-w-[100vw] ${
+              isMobile ? 'min-h-[100svh] w-full bg-slate-100' : 'h-screen w-screen shrink-0 bg-slate-100'
             }`}
           >
-            <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+            <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
               <LicenseDetailSection
                 selectedLicense={selectedLicense?.infoOnly ? selectedLicense : undefined}
                 onProceedToUpload={() => scrollToSection(uploadIndex)}
@@ -865,16 +907,17 @@ function LicensingPage() {
 
         <section
           id="apply"
-          className={`snap-start min-w-[100vw] h-screen ${
-            isMobile ? 'w-full overflow-y-auto bg-slate-200/70' : 'w-screen shrink-0 bg-slate-200/70'
+          data-flow-section
+          className={`snap-start min-w-[100vw] ${
+            isMobile ? 'min-h-[100svh] w-full bg-slate-200/70' : 'h-screen w-screen shrink-0 bg-slate-200/70'
           }`}
         >
-          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 py-14 md:px-10 md:py-16">
+          <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
             <UploadSection
               selectedLicense={selectedLicense}
-              onOpenUpload={() => setIsUploadOpen(true)}
+              onOpenUpload={openUpload}
               onOpenSelection={() => scrollToSection(1)}
-              onOpenTracking={() => setIsTrackingOpen(true)}
+              onOpenTracking={openTracking}
             />
           </div>
         </section>
@@ -928,21 +971,21 @@ function LicensingPage() {
         isOpen={isUploadOpen}
         isSubmitting={isSubmittingUpload}
         selectedLicenseName={selectedLicense?.name ?? ''}
-        onClose={() => setIsUploadOpen(false)}
+        onClose={closeUpload}
         onSubmit={handleUploadSubmit}
       />
 
-      <LicenseVerificationModal isOpen={isVerificationOpen} onClose={() => setIsVerificationOpen(false)} />
-      <LicenseTrackingModal isOpen={isTrackingOpen} onClose={() => setIsTrackingOpen(false)} />
+      <LicenseVerificationModal isOpen={isVerificationOpen} onClose={closeVerification} />
+      <LicenseTrackingModal isOpen={isTrackingOpen} onClose={closeTracking} />
 
       <SuccessModal
         isOpen={isSuccessOpen}
         trackingId={trackingId}
         title="Application Submitted Successfully"
         message="Your application has been submitted. A confirmation has been sent to your email. Use your email and tracking ID to check status."
-        onClose={() => setIsSuccessOpen(false)}
+        onClose={closeSuccess}
         onSubmitAnother={() => {
-          setIsSuccessOpen(false)
+          closeSuccess()
           scrollToSection(1)
         }}
         submitAnotherLabel="Submit Another Application"

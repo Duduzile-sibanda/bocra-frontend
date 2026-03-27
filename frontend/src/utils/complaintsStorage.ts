@@ -3,6 +3,8 @@ import type { ComplaintFormValues, ComplaintRecord, ComplaintStatus } from '../t
 const API_BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/+$/, '') ??
   'http://127.0.0.1:8000/api'
+const DEMO_MODE = (import.meta.env.VITE_DEMO_MODE as string | undefined) === 'true'
+const STORAGE_KEY = 'bocra_complaints_demo'
 
 type BackendComplaintStatus = 'pending' | 'under_review' | 'resolved' | 'rejected'
 
@@ -36,6 +38,33 @@ const statusMessages: Record<ComplaintStatus, string> = {
   Rejected: 'Your complaint was closed without approval. Contact support for clarification.',
 }
 
+const seededComplaints: ComplaintRecord[] = [
+  {
+    trackingId: '1001',
+    name: 'Kagiso M.',
+    email: 'kagiso@example.com',
+    company: 'Kgetsi Telecoms',
+    phone: '+26771000111',
+    category: 'Internet Speed',
+    complaint: 'Average speeds are significantly lower than advertised during peak hours.',
+    submittedAt: '2026-03-20T08:30:00.000Z',
+    status: 'In Review',
+    statusMessage: statusMessages['In Review'],
+  },
+  {
+    trackingId: '1002',
+    name: 'Neo P.',
+    email: 'neo@example.com',
+    company: 'Village Media',
+    phone: '+26772222333',
+    category: 'Billing',
+    complaint: 'Recurring charges are being applied after cancellation request.',
+    submittedAt: '2026-03-18T11:15:00.000Z',
+    status: 'Resolved',
+    statusMessage: statusMessages.Resolved,
+  },
+]
+
 const backendCategoryMap: Record<string, 'network' | 'billing' | 'technical' | 'general'> = {
   Billing: 'billing',
   'Internet Speed': 'network',
@@ -67,6 +96,51 @@ const toApiError = async (response: Response): Promise<string> => {
   return `Request failed with status ${response.status}`
 }
 
+const hasWindow = () => typeof window !== 'undefined'
+
+const isComplaintRecord = (value: unknown): value is ComplaintRecord => {
+  if (!value || typeof value !== 'object') return false
+  const entry = value as Record<string, unknown>
+  return (
+    typeof entry.trackingId === 'string' &&
+    typeof entry.name === 'string' &&
+    typeof entry.email === 'string' &&
+    typeof entry.company === 'string' &&
+    typeof entry.phone === 'string' &&
+    typeof entry.category === 'string' &&
+    typeof entry.complaint === 'string' &&
+    typeof entry.submittedAt === 'string' &&
+    typeof entry.status === 'string' &&
+    typeof entry.statusMessage === 'string'
+  )
+}
+
+const readDemoComplaints = (): ComplaintRecord[] => {
+  if (!hasWindow()) return []
+  const raw = window.localStorage.getItem(STORAGE_KEY)
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter(isComplaintRecord)
+  } catch {
+    return []
+  }
+}
+
+const writeDemoComplaints = (complaints: ComplaintRecord[]) => {
+  if (!hasWindow()) return
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(complaints))
+}
+
+const nextDemoReference = (existing: ComplaintRecord[]): string => {
+  const maxId = existing.reduce((max, current) => {
+    const asNumber = Number(current.trackingId)
+    return Number.isFinite(asNumber) ? Math.max(max, asNumber) : max
+  }, 1000)
+  return String(maxId + 1)
+}
+
 const withNetworkErrorHandling = (error: unknown): never => {
   if (error instanceof TypeError) {
     throw new Error(
@@ -85,12 +159,34 @@ const safeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<
 }
 
 export const ensureComplaintSeedData = () => {
-  // No-op now that complaints come from the backend API.
+  if (!DEMO_MODE) return
+  const current = readDemoComplaints()
+  if (current.length > 0) return
+  writeDemoComplaints(seededComplaints)
 }
 
 export const submitComplaint = async (
   values: ComplaintFormValues,
 ): Promise<ComplaintRecord> => {
+  if (DEMO_MODE) {
+    ensureComplaintSeedData()
+    const current = readDemoComplaints()
+    const record: ComplaintRecord = {
+      trackingId: nextDemoReference(current),
+      name: values.name,
+      email: values.email,
+      company: values.company,
+      phone: values.phone,
+      category: values.category,
+      complaint: values.complaint,
+      submittedAt: new Date().toISOString(),
+      status: 'Submitted',
+      statusMessage: statusMessages.Submitted,
+    }
+    writeDemoComplaints([record, ...current])
+    return record
+  }
+
   const title = `${values.category} complaint - ${values.company}`.slice(0, 255)
   const description = `Company: ${values.company}\n\n${values.complaint}`
   const backendCategory = backendCategoryMap[values.category] ?? 'general'
@@ -139,6 +235,12 @@ export const getComplaintByTrackingId = async (
 ): Promise<ComplaintRecord | null> => {
   const normalized = trackingId.trim()
   if (!normalized) return null
+
+  if (DEMO_MODE) {
+    ensureComplaintSeedData()
+    const complaints = readDemoComplaints()
+    return complaints.find((entry) => entry.trackingId === normalized) ?? null
+  }
 
   const response = await safeFetch(
     `${API_BASE_URL}/complaints/track/${encodeURIComponent(normalized)}`,

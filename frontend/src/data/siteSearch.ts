@@ -39,6 +39,30 @@ const CORE_PAGES: SiteSearchEntry[] = [
     keywords: ['licensing', 'application', 'type approval', 'verification', 'tracking'],
   },
   {
+    id: 'page-licensing-apply',
+    title: 'Apply for License',
+    description: 'Upload completed application forms and submit licensing requests.',
+    section: 'Licensing',
+    path: '/licensing#apply',
+    keywords: ['apply', 'upload', 'form', 'license application'],
+  },
+  {
+    id: 'page-licensing-verification',
+    title: 'License Verification',
+    description: 'Verify licensing details and check validity information.',
+    section: 'Licensing',
+    path: '/licensing',
+    keywords: ['verification', 'validate', 'check license'],
+  },
+  {
+    id: 'page-licensing-track',
+    title: 'Track Application',
+    description: 'Track a submitted licensing application using reference details.',
+    section: 'Licensing',
+    path: '/licensing',
+    keywords: ['track', 'tracking', 'status', 'application status'],
+  },
+  {
     id: 'page-complaints',
     title: 'Complaints',
     description: 'Consumer rights and complaint handling guidance with filing options.',
@@ -112,6 +136,57 @@ const CORE_PAGES: SiteSearchEntry[] = [
   },
 ]
 
+const LICENSE_TYPE_ENTRIES: SiteSearchEntry[] = [
+  {
+    id: 'license-type-approval',
+    title: 'Type Approval Licence',
+    description: 'Equipment model approval before importation, sale, or deployment.',
+    section: 'Licensing Types',
+    path: '/licensing',
+    keywords: ['type approval', 'equipment', 'model', 'certification'],
+  },
+  {
+    id: 'license-radio-dealers',
+    title: 'Radio Dealers Licence',
+    description: 'Importing, distributing, and selling radio communications equipment.',
+    section: 'Licensing Types',
+    path: '/licensing',
+    keywords: ['dealer', 'radio dealer', 'import', 'equipment'],
+  },
+  {
+    id: 'license-vans',
+    title: 'VANS Licence',
+    description: 'Value Added Network Services licensing for enhanced communications services.',
+    section: 'Licensing Types',
+    path: '/licensing',
+    keywords: ['vans', 'value added network', 'services'],
+  },
+  {
+    id: 'license-broadcasting',
+    title: 'Broadcasting Licence',
+    description: 'Licensing for radio and television broadcasting services.',
+    section: 'Licensing Types',
+    path: '/licensing',
+    keywords: ['broadcasting', 'tv', 'radio'],
+  },
+  {
+    id: 'license-satellite',
+    title: 'Satellite Service Licence',
+    description: 'Licensing for satellite communications service operations.',
+    section: 'Licensing Types',
+    path: '/licensing',
+    keywords: ['satellite', 'earth station', 'space communications'],
+  },
+  {
+    id: 'license-cellular',
+    title: 'Cellular Licence',
+    description: 'Licensing for mobile network operators and cellular services.',
+    section: 'Licensing Types',
+    path: '/licensing',
+    keywords: ['cellular', 'mobile operator', 'network'],
+  },
+]
+
 const ABOUT_ENTRIES: SiteSearchEntry[] = aboutSections.map((section) => ({
   id: `about-${section.id}`,
   title: section.heading,
@@ -159,6 +234,7 @@ const COMPLAINT_ENTRIES: SiteSearchEntry[] = complaintSections.map((section) => 
 
 export const SITE_SEARCH_INDEX: SiteSearchEntry[] = [
   ...CORE_PAGES,
+  ...LICENSE_TYPE_ENTRIES,
   ...ABOUT_ENTRIES,
   ...JOB_ENTRIES,
   ...PROJECT_ENTRIES,

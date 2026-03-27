@@ -20,12 +20,12 @@ function formatDate(dateISO: string) {
 }
 
 function CompactResourceRow({ item, onSelect }: { item: ResourceItem; onSelect: () => void }) {
-  return (
-    <Link
-      to={item.href}
-      onClick={onSelect}
-      className="group flex items-start gap-3 rounded-lg border border-slate-200 bg-white px-3 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
-    >
+  const isExternal = /^https?:\/\//i.test(item.href)
+  const rowClassName =
+    'group flex items-start gap-3 rounded-lg border border-slate-200 bg-white px-3 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2'
+
+  const content = (
+    <>
       <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-700">
         <FiFileText />
       </span>
@@ -42,6 +42,30 @@ function CompactResourceRow({ item, onSelect }: { item: ResourceItem; onSelect: 
           {item.description}
         </p>
       </div>
+    </>
+  )
+
+  if (isExternal) {
+    return (
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onSelect}
+        className={rowClassName}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <Link
+      to={item.href}
+      onClick={onSelect}
+      className={rowClassName}
+    >
+      {content}
     </Link>
   )
 }
@@ -248,22 +272,43 @@ function ResourcesInsightsSection() {
                   <h4 className="text-lg font-extrabold tracking-tight text-slate-900">Featured Reports</h4>
                   <div className="grid gap-2">
                     {featuredReports.map((report) => (
-                      <Link
-                        key={report.id}
-                        to={report.href}
-                        onClick={() => setIsResourcesOpen(false)}
-                        className="group rounded-lg border border-slate-200 bg-white px-3 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
-                      >
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Published {formatDate(report.publishedAt)}
-                        </p>
-                        <h5 className="mt-0.5 text-sm font-bold tracking-tight text-slate-900 transition-colors group-hover:text-[#BF1F5A]">
-                          {report.title}
-                        </h5>
-                        <p className="mt-0.5 text-xs text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1] overflow-hidden">
-                          {report.description}
-                        </p>
-                      </Link>
+                      /^https?:\/\//i.test(report.href) ? (
+                        <a
+                          key={report.id}
+                          href={report.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setIsResourcesOpen(false)}
+                          className="group rounded-lg border border-slate-200 bg-white px-3 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+                        >
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Published {formatDate(report.publishedAt)}
+                          </p>
+                          <h5 className="mt-0.5 text-sm font-bold tracking-tight text-slate-900 transition-colors group-hover:text-[#BF1F5A]">
+                            {report.title}
+                          </h5>
+                          <p className="mt-0.5 text-xs text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1] overflow-hidden">
+                            {report.description}
+                          </p>
+                        </a>
+                      ) : (
+                        <Link
+                          key={report.id}
+                          to={report.href}
+                          onClick={() => setIsResourcesOpen(false)}
+                          className="group rounded-lg border border-slate-200 bg-white px-3 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+                        >
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Published {formatDate(report.publishedAt)}
+                          </p>
+                          <h5 className="mt-0.5 text-sm font-bold tracking-tight text-slate-900 transition-colors group-hover:text-[#BF1F5A]">
+                            {report.title}
+                          </h5>
+                          <p className="mt-0.5 text-xs text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1] overflow-hidden">
+                            {report.description}
+                          </p>
+                        </Link>
+                      )
                     ))}
                   </div>
                 </div>

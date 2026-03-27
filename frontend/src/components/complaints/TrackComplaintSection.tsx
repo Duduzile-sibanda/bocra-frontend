@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import type { ComplaintRecord } from '../../types/complaints'
-import { getComplaintByTrackingId } from '../../utils/complaintsStorage'
+import { useComplaintsStore } from '../../stores/complaintsStore'
 import ActionButton from '../ui/ActionButton'
 import InputField from '../ui/InputField'
 
@@ -19,6 +19,7 @@ function TrackComplaintSection({
   onNotFound,
   onLookupError,
 }: TrackComplaintSectionProps) {
+  const findComplaintByTrackingId = useComplaintsStore((state) => state.findComplaintByTrackingId)
   const [trackingId, setTrackingId] = useState<string>(initialTrackingId)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -37,7 +38,7 @@ function TrackComplaintSection({
 
     setIsLoading(true)
     try {
-      const record = await getComplaintByTrackingId(normalized)
+      const record = await findComplaintByTrackingId(normalized)
       if (!record) {
         onNotFound(normalized)
         return

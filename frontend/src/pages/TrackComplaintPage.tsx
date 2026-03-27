@@ -3,6 +3,7 @@ import FeedbackModal from '../components/complaints/FeedbackModal'
 import TrackComplaintSection from '../components/complaints/TrackComplaintSection'
 import type { ComplaintRecord } from '../types/complaints'
 import { useState } from 'react'
+import { useComplaintsStore } from '../stores/complaintsStore'
 
 type TrackLocationState = {
   trackingId?: string
@@ -11,6 +12,7 @@ type TrackLocationState = {
 function TrackComplaintPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const lastTrackingId = useComplaintsStore((state) => state.lastTrackingId)
   const [feedbackModal, setFeedbackModal] = useState<{
     isOpen: boolean
     title: string
@@ -23,7 +25,7 @@ function TrackComplaintPage() {
     tone: 'success',
   })
   const state = (location.state as TrackLocationState | null) ?? null
-  const initialTrackingId = state?.trackingId ?? window.localStorage.getItem('bocra_last_tracking_id') ?? ''
+  const initialTrackingId = state?.trackingId ?? lastTrackingId ?? ''
 
   const handleFound = (record: ComplaintRecord) => {
     navigate(`/complaints/status/${encodeURIComponent(record.trackingId)}`)

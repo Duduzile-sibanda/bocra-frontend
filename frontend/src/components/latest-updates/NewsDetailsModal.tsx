@@ -78,7 +78,7 @@ function NewsDetailsModal({ article, isOpen, onClose }: NewsDetailsModalProps) {
         aria-labelledby="news-details-title"
         className="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
       >
-        <div className={`h-56 w-full bg-gradient-to-br ${article.imageThemeClass} sm:h-64`} aria-hidden="true" />
+        <img src={article.imageSrc} alt={article.imageAlt} className="h-56 w-full object-cover sm:h-64" />
         <div className="max-h-[calc(92vh-224px)] space-y-4 overflow-y-auto p-6 sm:max-h-[calc(92vh-256px)] sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-xs font-semibold tracking-wide text-slate-600">

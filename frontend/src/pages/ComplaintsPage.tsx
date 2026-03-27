@@ -7,17 +7,21 @@ import SuccessModal from '../components/complaints/SuccessModal'
 import TrackComplaintSection from '../components/complaints/TrackComplaintSection'
 import { complaintSections } from '../data/complaints'
 import type { ComplaintRecord } from '../types/complaints'
+import { useComplaintsStore } from '../stores/complaintsStore'
 
 type FlowSection = { id: string; type: 'info' | 'submit' | 'track' | 'status' }
 
 function ComplaintsPage() {
-  const [selectedRecord, setSelectedRecord] = useState<ComplaintRecord | null>(null)
+  const selectedRecord = useComplaintsStore((state) => state.selectedRecord)
+  const setSelectedRecord = useComplaintsStore((state) => state.setSelectedRecord)
+  const trackingSeedId = useComplaintsStore((state) => state.trackingSeedId)
+  const setTrackingSeedId = useComplaintsStore((state) => state.setTrackingSeedId)
+  const isSuccessOpen = useComplaintsStore((state) => state.isSuccessOpen)
+  const latestTrackingId = useComplaintsStore((state) => state.latestTrackingId)
+  const closeSuccessModal = useComplaintsStore((state) => state.closeSuccessModal)
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [activeIndex, setActiveIndex] = useState<number>(0)
   const [resetToken, setResetToken] = useState<number>(0)
-  const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false)
-  const [latestTrackingId, setLatestTrackingId] = useState<string>('')
-  const [trackingSeedId, setTrackingSeedId] = useState<string>('')
   const [feedbackModal, setFeedbackModal] = useState<{
     isOpen: boolean
     title: string
@@ -60,9 +64,15 @@ function ComplaintsPage() {
     if (!container) return
 
     const nextIndex = Math.min(Math.max(index, 0), totalSections - 1)
-    const offset = isMobile
-      ? nextIndex * container.clientHeight
-      : nextIndex * container.clientWidth
+    const sectionNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-flow-section]'))
+    const targetNode = sectionNodes[nextIndex]
+    const offset = targetNode
+      ? isMobile
+        ? targetNode.offsetTop
+        : targetNode.offsetLeft
+      : isMobile
+        ? nextIndex * container.clientHeight
+        : nextIndex * container.clientWidth
 
     container.scrollTo({
       top: isMobile ? offset : 0,
@@ -80,14 +90,45 @@ function ComplaintsPage() {
     if (!container) return
 
     const handleScroll = () => {
-      const size = isMobile ? container.clientHeight : container.clientWidth
+      const sectionNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-flow-section]'))
+      if (sectionNodes.length === 0) return
+
       const position = isMobile ? container.scrollTop : container.scrollLeft
-      const index = Math.round(position / Math.max(size, 1))
-      setActiveIndex(Math.min(Math.max(index, 0), totalSections - 1))
+      const viewportSize = isMobile ? container.clientHeight : container.clientWidth
+      const focalPoint = position + viewportSize * 0.35
+
+      let nearestIndex = 0
+      let nearestDistance = Number.POSITIVE_INFINITY
+
+      sectionNodes.forEach((node, idx) => {
+        const nodeStart = isMobile ? node.offsetTop : node.offsetLeft
+        const distance = Math.abs(nodeStart - focalPoint)
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearestIndex = idx
+        }
+      })
+
+      setActiveIndex(Math.min(Math.max(nearestIndex, 0), totalSections - 1))
     }
 
     const handleWheel = (event: WheelEvent) => {
       if (isMobile) return
+
+      const target = event.target as HTMLElement | null
+      const sectionElement = target?.closest<HTMLElement>('[data-flow-section]')
+
+      if (sectionElement) {
+        const canScrollDown =
+          event.deltaY > 0 &&
+          sectionElement.scrollTop + sectionElement.clientHeight < sectionElement.scrollHeight - 1
+        const canScrollUp = event.deltaY < 0 && sectionElement.scrollTop > 0
+
+        if (canScrollDown || canScrollUp) {
+          return
+        }
+      }
+
       event.preventDefault()
       container.scrollBy({
         left: event.deltaY + event.deltaX,
@@ -134,10 +175,7 @@ function ComplaintsPage() {
   }, [activeIndex, isMobile, totalSections])
 
   const handleSubmitSuccess = (record: ComplaintRecord) => {
-    setLatestTrackingId(record.trackingId)
     setTrackingSeedId(record.trackingId)
-    setIsSuccessOpen(true)
-    window.localStorage.setItem('bocra_last_tracking_id', record.trackingId)
   }
 
   return (
@@ -146,7 +184,7 @@ function ComplaintsPage() {
         ref={containerRef}
         className={`w-screen ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] ${
           isMobile
-            ? 'h-[100svh] overflow-y-auto overflow-x-hidden snap-y snap-mandatory'
+            ? 'min-h-[100svh] overflow-y-auto overflow-x-hidden'
             : 'h-[100svh] overflow-x-auto overflow-y-hidden snap-x snap-mandatory flex'
         } scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
       >
@@ -160,13 +198,14 @@ function ComplaintsPage() {
           return (
             <section
               key={sectionMeta.id}
+              data-flow-section
               className={`snap-start ${
                 isMobile
-                  ? `h-[100svh] w-full overflow-y-auto ${bgShade}`
-                  : `h-[100svh] w-screen shrink-0 overflow-y-auto ${bgShade}`
+                  ? `min-h-[100svh] w-full ${bgShade}`
+                  : `h-[100svh] w-screen shrink-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${bgShade}`
               }`}
             >
-              <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 py-14 md:px-10 md:py-16">
+              <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
                 {sectionMeta.type === 'info' && infoSection ? (
                   <div className="w-full py-2 md:py-4">
                     <h1 className="text-balance text-3xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
@@ -364,14 +403,14 @@ function ComplaintsPage() {
 
       <SuccessModal
         isOpen={isSuccessOpen}
-        onClose={() => setIsSuccessOpen(false)}
+        onClose={closeSuccessModal}
         trackingId={latestTrackingId}
         onTrackComplaint={() => {
-          setIsSuccessOpen(false)
+          closeSuccessModal()
           scrollToSection(trackIndex)
         }}
         onSubmitAnother={() => {
-          setIsSuccessOpen(false)
+          closeSuccessModal()
           setResetToken((current) => current + 1)
           scrollToSection(submitIndex)
         }}
