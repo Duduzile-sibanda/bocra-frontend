@@ -7,5 +7,8 @@
     "lint": "npm --prefix frontend run lint",
     "preview": "npm --prefix frontend run preview",
     "install:frontend": "npm --prefix frontend install"
+  },
+  "dependencies": {
+    "zustand": "^5.0.12"
   }
 }
