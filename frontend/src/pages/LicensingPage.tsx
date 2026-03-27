@@ -689,7 +689,15 @@ function LicensingPage() {
     if (!container) return
 
     const nextIndex = Math.min(Math.max(index, 0), totalSections - 1)
-    const offset = isMobile ? nextIndex * container.clientHeight : nextIndex * container.clientWidth
+    const sectionNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-flow-section]'))
+    const targetNode = sectionNodes[nextIndex]
+    const offset = targetNode
+      ? isMobile
+        ? targetNode.offsetTop
+        : targetNode.offsetLeft
+      : isMobile
+        ? nextIndex * container.clientHeight
+        : nextIndex * container.clientWidth
 
     container.scrollTo({
       top: isMobile ? offset : 0,
@@ -703,10 +711,25 @@ function LicensingPage() {
     if (!container) return
 
     const handleScroll = () => {
-      const size = isMobile ? container.clientHeight : container.clientWidth
+      const sectionNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-flow-section]'))
+      if (sectionNodes.length === 0) return
+
       const position = isMobile ? container.scrollTop : container.scrollLeft
-      const index = Math.round(position / Math.max(size, 1))
-      setActiveIndex(Math.min(Math.max(index, 0), totalSections - 1))
+      const viewportSize = isMobile ? container.clientHeight : container.clientWidth
+      const focalPoint = position + viewportSize * 0.35
+
+      let nearestIndex = 0
+      let nearestDistance = Number.POSITIVE_INFINITY
+      sectionNodes.forEach((node, idx) => {
+        const nodeStart = isMobile ? node.offsetTop : node.offsetLeft
+        const distance = Math.abs(nodeStart - focalPoint)
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearestIndex = idx
+        }
+      })
+
+      setActiveIndex(Math.min(Math.max(nearestIndex, 0), totalSections - 1))
     }
 
     const handleWheel = (event: WheelEvent) => {
@@ -829,13 +852,14 @@ function LicensingPage() {
         ref={containerRef}
         className={`w-screen ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] ${
           isMobile
-            ? 'h-[100svh] overflow-y-auto overflow-x-hidden snap-y snap-mandatory'
+            ? 'min-h-[100svh] overflow-y-auto overflow-x-hidden'
             : 'h-[100svh] overflow-x-auto overflow-y-hidden snap-x snap-mandatory flex'
         } scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
       >
         <section
-          className={`snap-start min-w-[100vw] h-screen ${
-            isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
+          data-flow-section
+          className={`snap-start min-w-[100vw] ${
+            isMobile ? 'min-h-[100svh] w-full bg-slate-100' : 'h-screen w-screen shrink-0 bg-slate-100'
           }`}
         >
           <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
@@ -848,10 +872,11 @@ function LicensingPage() {
         </section>
 
         <section
-          className={`snap-start min-w-[100vw] h-screen ${
+          data-flow-section
+          className={`snap-start min-w-[100vw] ${
             isMobile
-              ? 'w-full overflow-y-auto bg-slate-200/70'
-              : 'w-screen shrink-0 overflow-y-auto bg-slate-200/70'
+              ? 'min-h-[100svh] w-full bg-slate-200/70'
+              : 'h-screen w-screen shrink-0 overflow-y-auto bg-slate-200/70'
           }`}
         >
           <div className="mx-auto flex min-h-full w-full max-w-6xl items-start px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
@@ -865,8 +890,9 @@ function LicensingPage() {
 
         {showDetailSection ? (
           <section
-            className={`snap-start min-w-[100vw] h-screen ${
-              isMobile ? 'w-full overflow-y-auto bg-slate-100' : 'w-screen shrink-0 bg-slate-100'
+            data-flow-section
+            className={`snap-start min-w-[100vw] ${
+              isMobile ? 'min-h-[100svh] w-full bg-slate-100' : 'h-screen w-screen shrink-0 bg-slate-100'
             }`}
           >
             <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
@@ -881,8 +907,9 @@ function LicensingPage() {
 
         <section
           id="apply"
-          className={`snap-start min-w-[100vw] h-screen ${
-            isMobile ? 'w-full overflow-y-auto bg-slate-200/70' : 'w-screen shrink-0 bg-slate-200/70'
+          data-flow-section
+          className={`snap-start min-w-[100vw] ${
+            isMobile ? 'min-h-[100svh] w-full bg-slate-200/70' : 'h-screen w-screen shrink-0 bg-slate-200/70'
           }`}
         >
           <div className="mx-auto flex min-h-full w-full max-w-6xl items-center px-6 pb-32 pt-14 md:px-10 md:pb-36 md:pt-16">
